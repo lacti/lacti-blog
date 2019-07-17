@@ -13,6 +13,7 @@ deploy:
   on:
     branch: master
 before_script:
+  - "npm i -g yarn"
   - "yarn"
 script:
   - "yarn deploy"
