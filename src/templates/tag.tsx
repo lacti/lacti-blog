@@ -1,13 +1,24 @@
+import styled from "@emotion/styled";
 import * as React from "react";
 import { graphql } from "gatsby";
+
 import Page from "../components/Page";
 import Container from "../components/Container";
 import IndexLayout from "../layouts";
 import PostList from "../components/PostList";
 
-interface IndexPageProps {
+const StyledTitle = styled.h3`
+  margin: 0;
+  margin-bottom: 2rem;
+`;
+
+interface TagsProps {
+  pageContext: {
+    tag: string;
+  };
   data: {
     allMarkdownRemark: {
+      totalCount: number;
       edges: {
         node: {
           excerpt: string;
@@ -25,23 +36,25 @@ interface IndexPageProps {
   };
 }
 
-const IndexPage: React.FC<IndexPageProps> = ({
+const TagsTemplate: React.SFC<TagsProps> = ({
+  pageContext: { tag },
   data: {
-    allMarkdownRemark: { edges }
+    allMarkdownRemark: { edges, totalCount }
   }
 }) => (
   <IndexLayout>
     <Page>
       <Container>
+        <StyledTitle>{`${totalCount} posts tagged with ${tag}`}</StyledTitle>
         <PostList
           items={edges.map(
             ({
               node: {
                 excerpt,
-                fields: { slug, date },
+                fields: { date, slug },
                 frontmatter: { title, tags }
               }
-            }) => ({ excerpt, slug, date, title, tags })
+            }) => ({ excerpt, date, slug, title, tags })
           )}
         />
       </Container>
@@ -49,14 +62,16 @@ const IndexPage: React.FC<IndexPageProps> = ({
   </IndexLayout>
 );
 
-export default IndexPage;
+export default TagsTemplate;
 
 export const pageQuery = graphql`
-  {
+  query($tag: String) {
     allMarkdownRemark(
-      sort: { order: DESC, fields: [fields___date] }
       limit: 2000
+      sort: { fields: [fields___date], order: DESC }
+      filter: { frontmatter: { tags: { in: [$tag] } } }
     ) {
+      totalCount
       edges {
         node {
           excerpt(pruneLength: 240)

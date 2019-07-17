@@ -1,7 +1,9 @@
-import { dimensions, fonts, colors, breakpoints } from './variables'
-import { getEmSize } from './mixins'
+import { dimensions, fonts, colors, breakpoints } from "./variables";
+import { getEmSize } from "./mixins";
 
 export default `
+  @import url("https://fonts.googleapis.com/earlyaccess/notosanskr.css");
+
   html {
     box-sizing: border-box;
   }
@@ -29,8 +31,9 @@ export default `
   }
 
   a {
-    color: ${colors.brand};
+    color: ${colors.link};
     text-decoration: none;
+    font-weight: 500;
 
     &:hover,
     &:focus {
@@ -157,4 +160,22 @@ export default `
       padding-left: 1.25rem;
     }
   }
-`
+
+  code {
+    font-family: ${fonts.monospace};
+  }
+
+  code:not(.vscode-highlight-code) {
+    background-color: rgba(27,31,35,.05);
+    border-radius: 3px;
+    font-size: 95%;
+    margin: 0;
+    padding: .2em .4em;
+  }
+
+  code.vscode-highlight-code {
+    white-space: pre;
+    word-break: normal;
+    font-size: 90%;
+  }
+`;

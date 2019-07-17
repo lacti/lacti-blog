@@ -1,85 +1,102 @@
-'use strict'
+"use strict";
 
-const path = require('path')
+const path = require("path");
+
+const encodeTagForURL = tag => {
+  switch (tag) {
+    case "c++":
+      return "cplusplus";
+    case "c#":
+      return "csharp";
+    default:
+      return tag;
+  }
+};
 
 exports.onCreateNode = ({ node, actions, getNode }) => {
-  const { createNodeField } = actions
-
-  // Sometimes, optional fields tend to get not picked up by the GraphQL
-  // interpreter if not a single content uses it. Therefore, we're putting them
-  // through `createNodeField` so that the fields still exist and GraphQL won't
-  // trip up. An empty string is still required in replacement to `null`.
-
+  const { createNodeField } = actions;
   switch (node.internal.type) {
-    case 'MarkdownRemark': {
-      const { permalink, layout } = node.frontmatter
-      const { relativePath } = getNode(node.parent)
+    case "MarkdownRemark":
+      {
+        const { permalink, layout } = node.frontmatter;
+        const { relativePath } = getNode(node.parent);
+        const match = relativePath.match(/(\d{4})-(\d{2})-(\d{2})-(.+)\.md/);
+        const [_, y, m, d, name] = match;
+        createNodeField({ node, name: `date`, value: `${y}-${m}-${d}` });
 
-      let slug = permalink
+        let slug = permalink;
+        if (!slug) {
+          slug = `/${y}/${m}/${d}/${name}/`;
+        }
 
-      if (!slug) {
-        slug = `/${relativePath.replace('.md', '')}/`
+        createNodeField({ node, name: "slug", value: slug || "" });
+        createNodeField({ node, name: "layout", value: layout || "" });
       }
-
-      // Used to generate URL to view this content.
-      createNodeField({
-        node,
-        name: 'slug',
-        value: slug || ''
-      })
-
-      // Used to determine a page layout.
-      createNodeField({
-        node,
-        name: 'layout',
-        value: layout || ''
-      })
-    }
+      break;
   }
-}
+};
 
 exports.createPages = async ({ graphql, actions }) => {
-  const { createPage } = actions
+  const { createPage } = actions;
 
-  const allMarkdown = await graphql(`
+  const result = await graphql(`
     {
-      allMarkdownRemark(limit: 1000) {
+      allMarkdownRemark(
+        sort: { order: DESC, fields: [fields___date] }
+        limit: 2000
+      ) {
         edges {
           node {
             fields {
               layout
               slug
             }
+            frontmatter {
+              tags
+            }
           }
         }
       }
     }
-  `)
+  `);
 
-  if (allMarkdown.errors) {
-    console.error(allMarkdown.errors)
-    throw new Error(allMarkdown.errors)
+  if (result.errors) {
+    console.error(result.errors);
+    throw new Error(result.errors);
   }
 
-  allMarkdown.data.allMarkdownRemark.edges.forEach(({ node }) => {
-    const { slug, layout } = node.fields
-
+  const posts = result.data.allMarkdownRemark.edges;
+  posts.forEach(({ node: { fields: { slug, layout } } }) => {
     createPage({
       path: slug,
-      // This will automatically resolve the template to a corresponding
-      // `layout` frontmatter in the Markdown.
-      //
-      // Feel free to set any `layout` as you'd like in the frontmatter, as
-      // long as the corresponding template file exists in src/templates.
-      // If no template is set, it will fall back to the default `page`
-      // template.
-      //
-      // Note that the template has to exist first, or else the build will fail.
-      component: path.resolve(`./src/templates/${layout || 'page'}.tsx`),
+      component: path.resolve(`./src/templates/${layout || "page"}.tsx`),
       context: {
-        // Data passed to context is available in page queries as GraphQL variables.
         slug
       }
-    })
-  })
-}
+    });
+  });
+
+  const allTags = Array.from(
+    new Set(
+      posts
+        .map(
+          ({
+            node: {
+              frontmatter: { tags }
+            }
+          }) => tags
+        )
+        .reduce((a, b) => a.concat(b), [])
+    )
+  );
+  const tagTemplate = path.resolve(`./src/templates/tag.tsx`);
+  allTags.forEach(tag => {
+    createPage({
+      path: `/tag/${encodeTagForURL(tag)}/`,
+      component: tagTemplate,
+      context: {
+        tag
+      }
+    });
+  });
+};
