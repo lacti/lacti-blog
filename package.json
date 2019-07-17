@@ -10,8 +10,10 @@
   "license": "MIT",
   "main": "n/a",
   "scripts": {
-    "build": "gatsby build",
+    "build": "gatsby build --prefix-paths",
     "clean": "gatsby clean && rimraf public",
+    "copy-etc": "cp favicon.ico robots.txt public/",
+    "predeploy": "yarn clean && yarn build && yarn copy-etc",
     "deploy": "gatsby build --prefix-paths && gh-pages -d public",
     "dev": "gatsby develop",
     "format": "prettier --write \"src/**/*.{ts,tsx,md}\"",

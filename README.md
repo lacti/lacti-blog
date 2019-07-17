@@ -1,50 +1,20 @@
-# gatsby-starter-typescript-plus
+# Lacti's Archive
 
-> A starter kit for TypeScript-based Gatsby projects with sensible defaults.
+A source of [My blog](https://lacti.github.io/) that is powered by [`Gatsby.js`](https://www.gatsbyjs.org/) + [`React`](https://reactjs.org/) + [`TypeScript`](https://www.typescriptlang.org/) + [`Markdown`](https://wikipedia.org/wiki/Markdown).
 
-This is a starter kit for [Gatsby.js](https://www.gatsbyjs.org/) websites written in TypeScript. It includes the bare essentials for you to get started (styling, Markdown parsing, minimal toolset).
+## Things I do
 
-## Features
+- Start a blog from [`gatsby-starter-typescript-plus`](https://github.com/resir014/gatsby-starter-typescript-plus).
+- Add a [tag template](src/templates/tag.tsx).
+- Fix some layouts for me :)
+- Copy [contents](src/content/) from previous blog.
 
-- TypeScript
-- ESLint (with custom ESLint rules)
-- Markdown rendering with Remark
-- Basic component structure
-- Styling with [emotion](https://emotion.sh/)
+## Old days
 
-## Geting started
+I used [Jekyll](https://jekyllrb.com/) to build my own blog because it is so used widely and it is supported by GitHub as default. But after the time has gone that I installed that template I cannot remember any syntax and features of Jekyll and ruby so I cannot fix it anymore.
 
-Install this starter (assuming you have `gatsby-cli` installed) by running the following command:
+Gatsby.js is not simple that Jekyll I think but it is more friendly for me and can do more general things to generate pages with React and static site generator.
 
-```bash
-gatsby new project-name https://github.com/resir014/gatsby-starter-typescript-plus
-```
+## Thanks
 
-## Developing
-
-A nodejs >= 6.0.0 setup with [yarn](https://yarnpkg.com/) is recommended.
-
-```bash
-# install dependencies
-yarn
-
-# ...or, for npm
-npm install
-
-# serve with hot reload at localhost:8000
-npm start
-
-# build for production
-npm run build
-
-# build for production and push to gh-pages branch
-npm run deploy
-```
-
-## Credits
-
-Built with [Gatsby](https://www.gatsbyjs.org/) - the blazing-fast static site generator for [React](https://facebook.github.io/react/).
-
-## Deploy
-
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/resir014/gatsby-starter-typescript-plus)
+Thanks to [`gatsby-starter-typescript-plus`](https://github.com/resir014/gatsby-starter-typescript-plus).
