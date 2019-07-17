@@ -8,6 +8,7 @@ A source of [My blog](https://lacti.github.io/) that is powered by [`Gatsby.js`]
 - Add a [tag template](src/templates/tag.tsx).
 - Fix some layouts for me :)
 - Copy [contents](src/content/) from previous blog.
+- Chain [`Travis-CI`](https://travis-ci.org) to upload results by `gh-pages`.
 
 ## Old days
 

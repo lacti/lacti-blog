@@ -3,7 +3,7 @@
   "description": "A starter kit for TypeScript-based Gatsby projects with sensible defaults.",
   "version": "1.0.0",
   "private": true,
-  "author": "Resi Respati <resir014@gmail.com>",
+  "author": "jaeyoung.choi <lactrious@gmail.com>",
   "keywords": [
     "gatsby"
   ],
@@ -14,7 +14,7 @@
     "clean": "gatsby clean && rimraf public",
     "copy-etc": "cp favicon.ico robots.txt public/",
     "predeploy": "yarn clean && yarn build && yarn copy-etc",
-    "deploy": "gatsby build --prefix-paths && gh-pages -d public",
+    "deploy": "gh-pages -r ${GH_PAGES_REPO} -d public -b ${GH_PAGES_BRANCH}",
     "dev": "gatsby develop",
     "format": "prettier --write \"src/**/*.{ts,tsx,md}\"",
     "lint": "eslint 'src/**/*.{ts,tsx}'",
