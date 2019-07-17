@@ -7,8 +7,12 @@ cache:
 branches:
   only:
     - master
+before_install:
+  - npm i -g yarn
+install:
+  - yarn
 before_script:
-  - "npm i -g yarn"
-  - "yarn"
+  - git config --global user.name "jaeyoung.choi"
+  - git config --global user.email "lactrious@gmail.com"
 script:
   - "yarn deploy"
