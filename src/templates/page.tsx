@@ -7,12 +7,6 @@ import IndexLayout from "../layouts";
 import Tag from "../components/Tag";
 import PostDate from "../components/PostDate";
 
-const StyledDate = styled.sub`
-  font-size: 1rem;
-  font-weight: normal;
-  margin-left: 1rem;
-`;
-
 const StyledTagsContainer = styled.div`
   margin-bottom: 1rem;
 `;
