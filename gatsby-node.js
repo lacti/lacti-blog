@@ -1,5 +1,4 @@
-"use strict";
-
+/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require("path");
 
 const encodeTagForURL = tag => {
@@ -15,24 +14,23 @@ const encodeTagForURL = tag => {
 
 exports.onCreateNode = ({ node, actions, getNode }) => {
   const { createNodeField } = actions;
-  switch (node.internal.type) {
-    case "MarkdownRemark":
-      {
-        const { permalink, layout } = node.frontmatter;
-        const { relativePath } = getNode(node.parent);
-        const match = relativePath.match(/(\d{4})-(\d{2})-(\d{2})-(.+)\.md/);
-        const [_, y, m, d, name] = match;
-        createNodeField({ node, name: `date`, value: `${y}-${m}-${d}` });
+  if (node.internal.type === "MarkdownRemark") {
+    const { permalink, layout } = node.frontmatter;
+    const { relativePath } = getNode(node.parent);
+    let slug = permalink;
 
-        let slug = permalink;
-        if (!slug) {
-          slug = `/${y}/${m}/${d}/${name}/`;
-        }
+    const match = relativePath.match(/(\d{4})-(\d{2})-(\d{2})-(.+)\.md/);
+    if (match) {
+      const [_, y, m, d, name] = match;
+      createNodeField({ node, name: `date`, value: `${y}-${m}-${d}` });
 
-        createNodeField({ node, name: "slug", value: slug || "" });
-        createNodeField({ node, name: "layout", value: layout || "" });
+      if (!slug) {
+        slug = `/${y}/${m}/${d}/${name}/`;
       }
-      break;
+    }
+
+    createNodeField({ node, name: "slug", value: slug || "" });
+    createNodeField({ node, name: "layout", value: layout || "" });
   }
 };
 

@@ -18,6 +18,7 @@ interface IndexPageProps {
           frontmatter: {
             title: string;
             tags: string[];
+            permalink: string;
           };
         };
       }[];
@@ -34,15 +35,17 @@ const IndexPage: React.FC<IndexPageProps> = ({
     <Page>
       <Container>
         <PostList
-          items={edges.map(
-            ({
-              node: {
-                excerpt,
-                fields: { slug, date },
-                frontmatter: { title, tags }
-              }
-            }) => ({ excerpt, slug, date, title, tags })
-          )}
+          items={edges
+            .filter(edge => !edge.node.frontmatter.permalink)
+            .map(
+              ({
+                node: {
+                  excerpt,
+                  fields: { slug, date },
+                  frontmatter: { title, tags }
+                }
+              }) => ({ excerpt, slug, date, title, tags })
+            )}
         />
       </Container>
     </Page>
@@ -67,6 +70,7 @@ export const pageQuery = graphql`
           frontmatter {
             title
             tags
+            permalink
           }
         }
       }

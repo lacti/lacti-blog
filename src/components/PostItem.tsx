@@ -17,6 +17,10 @@ const StyledTitle = styled.h1`
   }
 `;
 
+const StyledTagsContainer = styled.div`
+  margin-bottom: 1rem;
+`;
+
 const StyledExcerpt = styled.p`
   word-break: break-all;
 `;
@@ -42,12 +46,12 @@ const PostItem: React.FC<PostItemProps> = ({
         {title}
       </Link>
     </StyledTitle>
-    <div>
+    <StyledTagsContainer>
       <PostDate date={date} />
       {tags.map(tag => (
         <Tag key={tag} tag={tag} />
       ))}
-    </div>
+    </StyledTagsContainer>
     <StyledExcerpt>{excerpt}</StyledExcerpt>
   </StyledContainer>
 );
