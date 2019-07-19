@@ -12,7 +12,7 @@
   "scripts": {
     "build": "gatsby build --prefix-paths",
     "clean": "gatsby clean && rimraf public",
-    "copy-etc": "cp favicon.ico robots.txt public/",
+    "copy-etc": "cp static/* public/",
     "predeploy": "yarn clean && yarn build && yarn copy-etc",
     "deploy": "gh-pages -r ${GH_PAGES_REPO} -d public -b ${GH_PAGES_BRANCH}",
     "dev": "gatsby develop",
