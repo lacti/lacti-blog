@@ -1,6 +1,6 @@
 {
-  "name": "gatsby-starter-typescript-plus",
-  "description": "A starter kit for TypeScript-based Gatsby projects with sensible defaults.",
+  "name": "lacti-blog",
+  "description": "A blog powered by Gatsby.js and gatsby-starter-typescript-plus",
   "version": "1.0.0",
   "private": true,
   "author": "jaeyoung.choi <lactrious@gmail.com>",
@@ -15,7 +15,7 @@
     "copy-etc": "cp static/* public/",
     "predeploy": "yarn clean && yarn build && yarn copy-etc",
     "deploy": "gh-pages -r ${GH_PAGES_REPO} -d public -b ${GH_PAGES_BRANCH}",
-    "dev": "gatsby develop",
+    "dev": "gatsby develop --host=0.0.0.0",
     "format": "prettier --write \"src/**/*.{ts,tsx,md}\"",
     "lint": "eslint 'src/**/*.{ts,tsx}'",
     "start": "yarn dev",
