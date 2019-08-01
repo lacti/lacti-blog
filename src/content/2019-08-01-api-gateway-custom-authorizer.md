@@ -68,7 +68,7 @@ WebSocket API를 사용하는 경우 request 기반의 인증만 사용해야 �
 
 [HTTP Basic authentication](https://tools.ietf.org/html/rfc7617)을 사용한다고 하면 인증 요청은 다음과 같이 HTTP Header로 전달된다.
 
-```text
+```yaml
 Authorization: Basic BASE64("id:password")
 ```
 
