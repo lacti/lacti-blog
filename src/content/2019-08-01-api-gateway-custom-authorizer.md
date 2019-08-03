@@ -3,11 +3,12 @@ title: API Gateway의 인증을 위한 Custom Authroizer 사용하기
 tags: ["aws", "serverless", "auth"]
 ---
 
-API Gateway와 Lambda Proxy를 사용하여 간단한 HTTP/s API나 WebSocket API를 구축할 수 있다. AWS CloudFormation을 직접 사용하여 서비스를 구성할 수도 있고, 최근에 나온 [aws-cdk](https://docs.aws.amazon.com/cdk/latest/guide/home.html)을 사용하여 구성할 수도 있다. 물론 [Serverless framework](https://serverless.com)과 같이 vendor 종속적이지 않은 framework을 사용할 수도 있다. 어느 쪽을 사용하든 각각이 제공하는 template을 이용하면 _Hello world_ 를 출력하는 HTTP/s API를 만드는데에 많은 시간이 필요하지 않다. ~~물론 처음일 경우, AWS 가입과 credential 등의 개발 환경의 설정에 많은 시간이 소요될 수 있다.~~
+API Gateway와 Lambda Proxy를 사용하여 간단한 HTTP/s API나 WebSocket API를 구축할 수 있다. AWS CloudFormation을 직접 사용하여 서비스를 구성할 수도 있고, 최근에 나온 [aws-cdk](https://docs.aws.amazon.com/cdk/latest/guide/home.html)을 사용하여 구성할 수도 있다. 물론 [Serverless framework](https://serverless.com)과 같이 vendor 종속적이지 않은 framework을 사용할 수도 있다. 어느 쪽을 사용하든 [각각이](https://github.com/lucpod/aws-lambda-workshop/tree/master/lessons/01-simple-hello-world-api) [제공하는](https://serverless.com/framework/docs/providers/aws/examples/hello-world/) template을 이용하면 _Hello world_ 를 출력하는 HTTP/s API를 만드는데에 많은 시간이 필요하지 않다. ~~물론 처음일 경우, AWS 가입과 [credential](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-credentials.html) 등의 개발 환경의 설정에 많은 시간이 소요될 수 있다.~~
 
 _Hello world_ 를 출력하기 위한 구조, Lambda의 코드가 어디에 올라가서 어떻게 배치되고 API Gateway가 어떤 gateway를 구성하며 그 둘이 어떻게 proxy로 설정되어 HTTP event를 받아 처리할 수 있는지, ~~나중에 기회가 되면 정리해보겠지만~~ 이미 각 시스템마다 훌륭한 글이 많이 있다.
 
 - [AWS Serverless getting started](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-getting-started-hello-world.html)
+- [AWS Serverless Application Model](https://github.com/awslabs/serverless-application-model)
 - [Hello world from Serverless framework](https://serverless.com/framework/docs/providers/aws/examples/hello-world/)
 
 어쨌든 구조를 간단히 이해하고 그 안에 로직을 추가하여 그럴싸한 서비스를 구축하는 것은 금방이다. 물론 단순히 API Gateway와 Lambda만으로 설명되는 서비스가 아니라 외부 자원이 필요한 서비스인 경우, 예를 들면,
@@ -17,7 +18,7 @@ _Hello world_ 를 출력하기 위한 구조, Lambda의 코드가 어디에 올�
 - SQS에 어떤 요청을 넣고 그 요청을 다른 서비스에서 처리할 수 있게 한다거나
 - MySQL이나 DynamoDB 등의 데이터베이스를 사용하는 서비스를 구축한다거나
 
-할 경우에는 각 자원에 대한 선언을 CloudFormation으로 해준다거나, 혹은 AWS Management console에서 작업한 후 환경 변수나 AWS SSM으로 공급해 사용할 수 있도록 만들어주어야 하므로 조금 더 알아야 할 내용이 있다. 하지만 본 내용에서는 그건 이미 다 했거나 혹은 할 필요가 없다고 가정하고, 그렇게 만들어진 서비스의 인증 부분을 작성하는 방법을 알아보도록 하겠다.
+할 경우에는 각 자원에 대한 선언을 CloudFormation으로 해준다거나, 혹은 AWS Management console에서 작업한 후 환경 변수나 AWS SSM으로 공급해 사용할 수 있도록 만들어주어야 하므로 조금 더 신경써야 하는 부분이 있다. 하지만 본 내용에서는 _그건 이미 다 했거나 혹은 할 필요가 없다고 가정하고_, 그렇게 만들어진 서비스의 **인증** 부분을 작성하는 방법을 알아보도록 하겠다.
 
 ## API Gateway의 Authorizer
 
@@ -27,14 +28,14 @@ API Gateway로 들어오는 요청에 대한 인증을 처리하기 위한 방�
 - [request 기반의 Lambda authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html#api-gateway-lambda-authorizer-request-lambda-function-create)
 - [AWS Cognito user pool을 사용하는 authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-integrate-with-cognito.html)
 
-[AWS Cognito](https://aws.amazon.com/cognito/)는 유저 관리와 인증에 대한 많은 부분을 처리해주는 서비스로 기능도 많고 알아야할 것도 많다. 하지만 직접 서비스를 운영하는 입장이 아니라 토이 프로젝트를 하는 상황이라면 하려는 일에 비해 해야할 일이 너무 많아서 잘 사용하지 않게 되었다. 때문에 Cognito는 잠시 접어두고 Lambda authorizer로 아주 간단한 수준의 authorizer를 만드는 쪽에 집중해보자.
+[AWS Cognito](https://aws.amazon.com/cognito/)는 유저 관리와 인증에 대한 많은 부분을 처리해주는 서비스로 기능도 많고 알아야할 것도 많다. 하지만 제대로 된 서비스를 운영하는 것이 아니라 간단한 개인 프로젝트를 진행할 때 사용하기에는 너무 알아야 할 것도 많고 관리할 것도 많아서 차라리 직접 만든다고 해도 좀 더 간단한 무언가를 쓰는 것이 낫다는 생각이 든다. 때문에 Cognito는 잠시 접어두고 Lambda authorizer로 아주 간단한 수준의 authorizer를 만드는 쪽을 선택하게 되었다.
 
 [![Custom auth workflow](https://docs.aws.amazon.com/apigateway/latest/developerguide/images/custom-auth-workflow.png)](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html)
 
 AWS 문서의 공식 그림인데 이 그림이 모든 것을 설명해준다.
 
-- API Gateway가 client로부터 요청을 받으면, token이냐 request냐에 따라 적절한 정보를 추려서 `auth function`을 실행해준다.
-- `auth function`이 `Allow`나 `Deny` 여부를 포함하는 policy document를 작성해서 반환하면 authorizer 설정에 따라 그것을 cache한다. 이는 동일한 auth 정보에 대해 `auth function`을 또 실행하지 않도록 해준다. 즉 비용 절감이 된다.
+- API Gateway가 client로부터 요청을 받으면, token이냐 request냐에 따라 _적절한 정보를 추려서_ `auth function`을 실행해준다.
+- `auth function`이 `Allow`나 `Deny` 여부를 포함하는 [`policy document`](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-lambda-authorizer-output.html)를 반환하면 [authorizer 설정에 따라 그것을 cache](https://docs.aws.amazon.com/apigateway/latest/developerguide/configure-api-gateway-lambda-authorization-with-console.html)한다. 이는 동일한 auth 정보에 대해 `auth function`을 또 실행하지 않도록 해준다. 즉 비용 절감이 된다.
 - _allow_ 가 되면 API Gateway의 HTTP event를 받을 Lambda나 EC2 endpoint가 호출된다.
 
 마치 http server framework의 security middleware처럼 router에 의해 request에 대한 handler가 호출되기 전에 미리 request 내의 auth 정보를 보고 요청을 drop하는 (빠르게 4xx로 응답해버리는) 과정과 같다. 재미난 점은 `auth function`이 만들어진 policy가 cache될 수 있다는 점이고, 덕분에 `auth function`의 lambda call 비용을 절약할 수 있을 뿐만 아니라, `Deny` policy가 cache되었을 경우 API Gateway는 `auth function`도, proxy endpoint도 부르지 않고 응답을 해버리는데 [이 때 비용이 부과되지 않는다는 것이다.](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-pricing.html)
@@ -45,7 +46,7 @@ AWS 문서의 공식 그림인데 이 그림이 모든 것을 설명해준다.
 
 - 정상적인 상황에서도 모든 lambda handler가 auth를 수행하기 위한 시간을 소모하지 않고 하나의 `auth function`을 공유하는 여러 handler에 대해 `auth function`의 policy가 cache되어 auth cost를 1회로 줄일 수 있고,
 - 그마저도 `auth function`에서 JWT의 `verify` 만 수행한다면 매번 DB 등의 서버 측 state를 확인하는 것에 비해 최소한의 비용으로 인증이 가능할 것이고,
-- 잘못된 인증을 요구하는 경우에도 deny policy에 의해 API Gateway 비용조차 부과되지 않으므로 ~~간단한~~ 공격에 대해서는 어느 정도 방어가 될 수 있겠다.
+- 잘못된 인증을 요구하는 경우에도 1회 수행 이후 cache된 deny policy에 의해 API Gateway 비용조차 부과되지 않으므로 ~~간단한~~ 공격에 대해서는 어느 정도 비용 방어가 될 수 있겠다.
 
 물론 무작위 인증 토큰을 포함하는 DDoS의 공격은 이 수준으로 방어하기는 어려운데 이 때에는 [WAF](https://aws.amazon.com/waf/)를 사용해서 _진지한_ 방어를 고민해야겠다. 그래도 예전처럼 API Gateway + Lambda proxy의 2-tier 모델보다는 공격 상황에서도 어느 정도 비용 방어가 되기 때문에 인증이 필요한 서비스의 구축이 필요하다면 Lambda auhtorizer는 유의미한 선택이라 할 수 있다.
 
@@ -54,9 +55,11 @@ AWS 문서의 공식 그림인데 이 그림이 모든 것을 설명해준다.
 token 기반의 인증과 request 기반의 인증의 큰 차이점은 `auth function`에서 받는 [`event`에 포함된 정보](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-lambda-authorizer-input.html)이다. 둘 다 어떤 method를 실행하려 했는지는 `event.methodArn`을 통해 받을 수 있지만 인증에 필요한 정보를 어느 정도로 추려주느냐에서 차이가 있다.
 
 - token 기반은 [HTTP Authorization](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication)으로 전달되는 정보만 `event.authorizationToken`로 넘어온다.
-- request 기반은 HTTP header, queryString, pathParameters, stageVariables 정보를 받을 수 있다. 때문에 token 기반을 사용할 때 받을 수 있는 정보를 포함하여 거의 대부분의 HTTP 요청 정보를 받을 수 있다고 볼 수 있다.
+- request 기반은 `HTTP header`, `queryString`, `pathParameters`, `stageVariables` 정보를 받을 수 있다. 때문에 token 기반을 사용할 때 받을 수 있는 정보를 포함하여 거의 대부분의 HTTP 요청 정보를 받을 수 있다고 볼 수 있다.
 
-WebSocket API를 사용하는 경우 request 기반의 인증만 사용해야 한다고 한다. 하지만 HTTP/s API를 작성할 때에는 둘 다 선택할 수 있으며, 조금이라도 더 많은 양이 cache될 수 있도록 기원하면서 조금이라도 더 적은 정보를 사용하는 token 기반의 인증을 사용해보도록 하자. 물론 server에 session state를 관리하고 싶지 않으므로 JWT를 사용할 것이므로,
+Basic authentication을 사용하여 인증을 진행할 때에는 _token 기반_ 의 인증으로도 충분하다. `HTTP Authorization` header에 필요한 정보가 모두 포함되어있기 때문이다. 물론 이 예제는 HTTP/s API를 사용하기 때문에 token과 request 두 방식 모두 사용할 수 있어서 선택이 가능하고, 만약 **WebSocket API를 사용하는 경우는 request 기반만 사용할 수 있으므로 이 점에 주의해야 한다.**
+
+Basic authentication으로 전달되는 id와 password가 올바르다면 이에 대한 session을 유지해야 하는데 이를 위해 따로 서버에서 state를 관리하고 싶지는 않으므로 좀 더 편한 방식인 [JWT](https://en.wikipedia.org/wiki/JSON_Web_Token)를 사용할 것이다. 이를 [HttpOnly, Secure Cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies)로 전달해서 추후 인증에서도 사용하도록 할 수 있지만 여기서는 token 기반의 인증을 사용하므로 이 JWT 값도 `HTTP Authorization` header의 [`Bearer` scheme](https://tools.ietf.org/html/rfc6750)으로 전달하도록 한다. 이제
 
 - JWT를 발급할 수 있는 login API와
 - 그 이후에 접근할 수 있는 간단한 API와
@@ -84,7 +87,7 @@ const decodeBase64 = (input: string) =>
   Buffer.from(input, "base64").toString("utf8");
 ```
 
-이제 `login API`를 작성할 수 있다. 이 함수는 일반 HTTP/s API이므로 `APIGatewayProxyEvent`의 `headers`로부터 `Authorization` 값을 가져와서 id와 password 부분을 얻어낸 후 비교하고, 기대된 값이면 JWT를 생성하여 반환한다.
+이제 `login API`를 작성할 수 있다. 이 함수는 일반 HTTP/s API이므로 `APIGatewayProxyEvent`의 `headers`로부터 `Authorization` 값을 가져와서 id와 password 부분을 얻어낸 후 비교하고, 기대된 값이면 JWT를 발급하여 반환한다. JWT를 발급하는 것은 [라이브러리](https://github.com/auth0/node-jsonwebtoken)를 사용해서 간단하게 수행할 수 있다.
 
 ```typescript
 const jwtSecret = "verySecret";
@@ -116,7 +119,7 @@ export const login: APIGatewayProxyHandler = async event => {
 
 ### Auth function
 
-이제 이후에는 생성된 JWT로만 요청을 하게 될 것이므로 이 토큰의 유효성을 검증하는 `auth function`은 간단하게 작성할 수 있다. 다만 이 token은 [Bearer Authorization](https://tools.ietf.org/html/rfc6750)으로 전달되므로 이것만 신경써주면 된다.
+이제 이후에는 생성된 JWT로만 요청을 하게 될 것이므로 이 토큰의 유효성을 검증하는 `auth function`은 간단하게 작성할 수 있다. 이 token은 [Bearer Authorization](https://tools.ietf.org/html/rfc6750)으로 전달되므로 그 값을 받아 [라이브러리](https://github.com/auth0/node-jsonwebtoken)로 유효성을 검사한다.
 
 ```typescript
 export const auth: CustomAuthorizerHandler = async event => {
@@ -195,7 +198,7 @@ functions:
 
 ## 테스트
 
-배포하면 `https://API-ID.execute-api.REGION.amazonaws.com/dev/{login, hello}` API를 얻을 수 있다. 이제 로그인을 수행하려면 다음과 같이 curl을 사용할 수 있다.
+배포하면 `https://API-ID.execute-api.REGION.amazonaws.com/dev/` 하위에 `login`과 `hello` API를 얻을 수 있다. 이제 로그인을 수행하려면 다음과 같이 curl을 사용할 수 있다.
 
 ```bash
 $ curl -XPOST "https://test:1234@API-ID.execute-api.REGION.amazonaws.com/dev/login"
@@ -205,7 +208,7 @@ $ curl -XPOST "https://test:1234@API-ID.execute-api.REGION.amazonaws.com/dev/log
 이제 얻어낸 JWT 값을 사용하여 `hello API`를 요청할 수 있다.
 
 ```bash
-$ curl -XGET -H "Authorization: Bearer TOKEN-FROM-RESPONSE" "https://API-ID.execute-id.REGION.amazonaws.com/dev/hello"
+$ curl -XGET -H "Authorization: Bearer JWT-FROM-RESPONSE" "https://API-ID.execute-id.REGION.amazonaws.com/dev/hello"
 {"resource":"/hello","path":"/hello","httpMethod":"GET","headers":{"Accept":"*/*","Authorization":"Bearer TOKEN-FROM-RESPONSE",...},...}
 ```
 
@@ -224,7 +227,7 @@ $ curl -v -XGET "https://API-ID.execute-id.REGION.amazonaws.com/dev/hello"
 ## 정리
 
 - Basic authentication으로 요청된 id와 password로부터 JWT를 생성하는 `login API`와
-- 그 JWT를 verify해서 적절한 resource 범위의 policy를 생성하는 `auth function`
-- 그리고 그 auth 함수를 `authorizer`로 사용하면 그 API는 인증을 처리할 수 있게 된다.
+- 발급된 JWT를 verify해서 적절한 resource 범위의 policy를 생성하는 `auth function`을 만들면,
+- 인증이 필요한 API를 구성할 때 위 `auth function`을 `authorizer`로 연결해서 사용할 수 있게 된다.
 
-간단한 개인 프로젝트도 인증을 통해 API를 보호해야 하는 경우가 있는데 이 방법으로 간단한 인증 체계를 구성할 수 있다. 만약 여러 사람의 인증이 필요한 경우에도 database나 cognito를 사용하지 않고 간단히 id, password 목록을 S3에 저장해두고 그 값을 불러와서 사용하는 방법을 쓸 수도 있겠다.
+Serverless로 구성된 간단한 데이터베이스 등 개인 프로젝트를 진행할 때에도 API들을 인증으로 보호해야 하는 경우가 있는데 이제 위 방법을 사용해서 간단한 인증 체계를 구성할 수 있다. id나 password, 혹은 token을 환경 변수로 관리해서 특정 유저만 허용해도 좋고 필요하다면 S3에 인증 정보를 넣어두고 불러와서 사용해도 되겠다.
