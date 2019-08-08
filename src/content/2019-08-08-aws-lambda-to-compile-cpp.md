@@ -49,4 +49,22 @@ hello 1
 외부 runtime이 `amazonlinux` docker에서 잘 실행이 된다면 반은 성공한 것이다. AWS Lambda에서도 그게 올바르게 실행되기 위해서는 적어도 3가지를 조심해야 하는데,
 
 - AWS Lambda의 용량 제한은 얼마인가
-- 이 외부 runtime을
+- 이 외부 runtime을 실행하기 위한 플랫폼이 일치하는가
+- container의 제약 조건이 충분히 너그러워서 외부 runtime을 실행할 수 있는가
+
+먼저 AWS Lambda의 storage는 코드가 배포되는 readonly storage인 `/var/task` 와 임시 파일을 read/write할 수 있는 `/tmp`가 있다.
+
+
+#### AWS Lambda의 code storage
+
+`/var/task` 에 파일을 배포하려면 처음 `lambda function` 을 등록할 때 s3로 제출하는 압축 파일에 배포할 파일을 다 넣어놔야 하고, 이 때 `/var/task` 에서 허용해주는 최대 용량은 약 **250MB** 이다. 이 때 압축은 zip으로 하기 때문에 별다른 옵션을 주지 않는다면 symbol link가 유지되지 않을 수 있고 info-zip 규격이 아닐 경우 permission이 모두 소실되므로 위와 같이 정리된 외부 runtime을 실행하기가 어렵거나 불가능하다.
+
+심지어 symlink를 사용하지 않고 어떻게 잘 배포했다고 해도 실행 파일의 모든 executable permission이 사라지게 되고, 여기에 chmod 등으로 실행 권한을 부여하려고 해도 readonly storage이므로 불가능하다.
+
+AWS Lambda Layer를 사용하여 미리 구성된 혹은 provided runtime을 구성할 수 있지만 이것들도 모두 합쳐 250MB의 공간을 같이 사용하는 것이기 때문에 각별히 주의해야 한다.
+
+하지만 이러한 단점에도 불구하고 이후 설명한 tmp storage (512MB) 와 합쳐 AWS Lambda가 최대한 사용할 수 있는 storage 공간의 총 크기가 750MB 수준인 점으로 볼 때 이 용량은 너무나도 소중하다. 만약 tensorflow 같은 다소 무거운 라이브러리를 AWS Lambda에 배포할 계획이 있다면 이 점은 꼭 명심해야 한다.
+
+또한 정확한 내용은 알 수 없지만 두 storage의 write speed가 달라서 가급적이면 
+
+#### AWS Lambda의 tmp storage
