@@ -143,10 +143,32 @@ export const auth: CustomAuthorizerHandler = async event => {
 
 token의 유효성 여부에 따라 허가 여부를 결정해서 Policy를 만들어주면 된다. 이 때 Resource에 범위를 적절히 설정해주어야 하는데, **이 예제는 간단해서 요청한 `methodArn`을 그대로** 전달한다. 물론 API가 여러 개일 경우 단일 Resource를 포함하는 allow policy가 여러 개 생성되거나 범위 Resource를 포함하는 allow policy가 생성되어야 한다. 그렇지 않으면 **X API를 요청할 때 만들어져 cache된 policy로 Y API를 요청할 때에도 사용하게 되므로 `Resource`가 맞지 않아 제대로 허용되지 않을 수 있다.**
 
-이를 위해 간단히 policy의 cache를 끄는 방법도 있지만 이 경우 `auth` handler가 매번 실행되므로 비용이나 성능 최적화 측면에서 손해를 보게 된다. 때문에 `event.methodArn`을 적절히 사용하여 범위로 허용해 줄 수 있도록 사용해야 한다. `methodArn`의 규격은 다음과 같으므로 `stage`와 `httpVerb`를 적당히 `*`로 정해주면 되겠다.
+이를 위해 간단히 policy의 cache를 끄는 방법도 있지만 이 경우 `auth` handler가 매번 실행되므로 비용이나 성능 최적화 측면에서 손해를 보게 된다. 때문에 `event.methodArn`을 적절히 사용하여 범위로 허용해 줄 수 있도록 사용해야 한다.
+
+#### Allow many functions
+
+`methodArn`의 규격은 다음과 같으므로 `stage`와 `httpVerb`를 적당히 `*`로 정해주면 되겠다.
 
 ```text
 arn:aws:execute-api:{regionId}:{accountId}:{apiId}/{stage}/{httpVerb}/[{resource}/[{child-resources}]]
+```
+
+```typescript
+const [, , , region, accountId, apiId, stage] = event.methodArn.split(/[:/]/);
+const scopedMethodArn =
+  ["arn", "aws", "execute-api", region, accountId, apiId].join(":") +
+  "/" +
+  [stage, /* method= */ "*", /* function= */ "*"].join("/");
+```
+
+새롭게 만들어진 `methodArn`은 이번 요청에 수행될 Lambda function 뿐만 아니라 다른 httpVerb의 resource도 실행 가능하도록 `*`으로 넓게 지정되었다. 이제 이 policy가 cache될 것이고 다른 httpEndpoint가 호출되어도 범위로 지정된 `methodArn`에 의해 Lambda 수행 허가가 문제 없이 이루어질 것이다.
+
+물론 이렇게 간단히 `*`로 지정하기 어렵고 매번 `auth function`이 판단을 해야 하는 경우도 있다. 이 경우는 오히려 policy cache를 사용하지 않도록 설정해야 하는데 `Serverless framework`에서는 `resultTtlInSeconds`를 `0`으로 지정하면 된다.
+
+```yaml
+authorizer:
+  name: auth
+  resultTtlInSeconds: 0
 ```
 
 ### Hello API
