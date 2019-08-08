@@ -40,7 +40,7 @@ AWS 문서의 공식 그림인데 이 그림이 모든 것을 설명해준다.
 
 마치 http server framework의 security middleware처럼 router에 의해 request에 대한 handler가 호출되기 전에 미리 request 내의 auth 정보를 보고 요청을 drop하는 (빠르게 4xx로 응답해버리는) 과정과 같다. 재미난 점은 `auth function`이 만들어진 policy가 cache될 수 있다는 점이고, 덕분에 `auth function`의 lambda call 비용을 절약할 수 있을 뿐만 아니라, `Deny` policy가 cache되었을 경우 API Gateway는 `auth function`도, proxy endpoint도 부르지 않고 응답을 해버리는데 [이 때 비용이 부과되지 않는다는 것이다.](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-pricing.html)
 
-> Calling methods with the authorization type of AWS_IAM, CUSTOM, and COGNITO_USER_POOLS are not charged for authorization and authentication failures.
+> Calling methods with the authorization type of `AWS_IAM`, `CUSTOM`, and `COGNITO_USER_POOLS` are not charged for authorization and authentication failures.
 
 이는 비용 최적화 측면에서 꽤 유리한데,
 
