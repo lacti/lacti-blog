@@ -3,17 +3,17 @@ title: AWS Lambda에서의 setTimeout
 tags: ["aws", "serverless", "auth"]
 ---
 
-[AWS Lambda에서 실행하기 위한](https://www.npmjs.com/package/@yingyeothon/actor-system-aws-lambda-support) [분산 ActorSystem](https://www.npmjs.com/package/@yingyeothon/actor-system)을 개발하고 있다. 처음에는 단순히 actor의 state를 [Redis](https://www.npmjs.com/package/@yingyeothon/repository-redis)나 [S3](https://www.npmjs.com/package/@yingyeothon/repository-s3)에 기록하고 [Redis를 기반으로 작성된 Queue와 Lock](https://www.npmjs.com/package/@yingyeothon/actor-system-redis-support)으로 메시지를 교환하면 될 것이라고 생각하고 열심히 만들고 있었다. 하지만 이 모든 것은 actor간 `Deferred Message`를 교환해야 할 필요가 있는 시점에서 문제가 발생했다. _actor 시스템에 대한 이야기도 충분히 재미있지만 이는 추후에 다뤄보도록 하자._
+[AWS Lambda에서 실행하기 위한](https://www.npmjs.com/package/@yingyeothon/actor-system-aws-lambda-support) [분산 ActorSystem](https://www.npmjs.com/package/@yingyeothon/actor-system)을 개발하고 있다. 처음에는 단순히 actor의 state를 [Redis](https://www.npmjs.com/package/@yingyeothon/repository-redis)나 [S3](https://www.npmjs.com/package/@yingyeothon/repository-s3)에 기록하고 [Redis를 기반으로 작성된 Queue와 Lock](https://www.npmjs.com/package/@yingyeothon/actor-system-redis-support)으로 메시지를 교환하면 될 것이라고 생각하고 열심히 만들고 있었다. 하지만 이 모든 것은 actor간 `Delayed Message`를 교환해야 할 필요가 있는 시점에서 문제가 발생했다. _actor 시스템에 대한 이야기도 충분히 재미있지만 이는 추후에 다뤄보도록 하자._
 
-`Deferred Message`는 `visiblity`가 지정된 시간 뒤에 확보되는 message로 간단히 `setTimeout(() => post(message), millis)`와 같은 형태가 된다. 그렇다면 `setTimeout`을 `AWS Lambda`에서 사용해도 문제가 없을까? 이 문제를 확인하기 위해 AWS Lambda에 대한 기본 성질과 간단한 실험을 진행해보자.
+[`Delayed Message`](https://github.com/rabbitmq/rabbitmq-delayed-message-exchange)는 `visiblity`가 지정된 시간 뒤에 확보되는 message로 간단히 `setTimeout(() => post(message), millis)`와 같은 형태가 된다. 그렇다면 `setTimeout`을 `AWS Lambda`에서 사용해도 문제가 없을까? 이 문제를 확인하기 위해 AWS Lambda에 대한 기본 성질과 간단한 실험을 진행해보자.
 
 ## Lambda는 언제 끝나나
 
 [Understanding Container Reuse in AWS Lambda](https://aws.amazon.com/blogs/compute/container-reuse-in-lambda/) 글에서 자세히 나와있는데 인용해보면 다음과 같다.
 
-> **Timeout.** The user-specified duration has been reached. Execution will be summarily halted regardless of what the code is currently doing.
-> **Controlled termination.** One of the callbacks (which need not be the original handler entry point) invokes context.done() and then finishes its own execution. Execution will terminate regardless of what the other callbacks (if any) are doing.
-> **Default termination.** If all callbacks have finished (even if none have called context.done()), the function will also end. If there is no call to context.done(), you’ll see the message “Process exited before completing request” in the log (in this case, it really means ‘exited without having called context.done()’).
+> - **Timeout.** The user-specified duration has been reached. Execution will be summarily halted regardless of what the code is currently doing.
+> - **Controlled termination.** One of the callbacks (which need not be the original handler entry point) invokes context.done() and then finishes its own execution. Execution will terminate regardless of what the other callbacks (if any) are doing.
+> - **Default termination.** If all callbacks have finished (even if none have called context.done()), the function will also end. If there is no call to context.done(), you’ll see the message “Process exited before completing request” in the log (in this case, it really means ‘exited without having called context.done()’).
 
 [AWS Lambda Limits](https://docs.aws.amazon.com/lambda/latest/dg/limits.html)에 나와있듯이 Lambda는 event source에 따라 **30/900초**의 timeout이 존재한다. 그 내에서 `context.done()` 혹은 `callback`을 불러서 Lambda를 정상적으로 끝내야 의도된 종료가 되는데, 최근 NodeJS runtime은 handler가 `Promise`일 경우 그 반환 값이 [`APIGatewayProxyResult`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/aws-lambda/index.d.ts#L497)이면 정상적인 반환으로 처리가 된다.
 
