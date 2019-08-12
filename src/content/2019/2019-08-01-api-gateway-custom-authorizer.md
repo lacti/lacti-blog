@@ -149,7 +149,7 @@ token의 유효성 여부에 따라 허가 여부를 결정해서 Policy를 만�
 
 `methodArn`의 규격은 다음과 같으므로 `stage`와 `httpVerb`를 적당히 `*`로 정해주면 되겠다.
 
-```text
+```yaml
 arn:aws:execute-api:{regionId}:{accountId}:{apiId}/{stage}/{httpVerb}/[{resource}/[{child-resources}]]
 ```
 

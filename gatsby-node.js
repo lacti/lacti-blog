@@ -21,7 +21,7 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
 
     const match = relativePath.match(/(\d{4})-(\d{2})-(\d{2})-(.+)\.md/);
     if (match) {
-      const [_, y, m, d, name] = match;
+      const [, y, m, d, name] = match;
       createNodeField({ node, name: `date`, value: `${y}-${m}-${d}` });
 
       if (!slug) {
