@@ -9,7 +9,7 @@ module.exports = {
       url: "https://twitter.com/lacti",
       email: "lactrious@gmail.com"
     },
-    image: "https://lacti.github.io/lacti.jpg"
+    image: "https://lacti.github.io/background.jpg"
   },
   plugins: [
     {
