@@ -1,0 +1,21 @@
+name: "Update blog"
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js 10.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+    - name: Deploy using Gastby.js
+      run: |
+        npm i -g yarn
+        git config --global user.name "jaeyoung.choi"
+        git config --global user.email "lactrious@gmail.com"
+        yarn
+        yarn deploy
+      env:
+        GH_PAGES_BRANCH: master
+        GH_PAGES_REPO: git@github.com:lacti/lacti.github.io
