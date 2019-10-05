@@ -71,7 +71,7 @@ const IndexLayout: React.FC<IndexProps> = props => (
               { name: "og:image", content: image }
             ]}
           />
-          <Header title={title} />
+          <Header title={siteMetadata.title} />
           <LayoutMain>{props.children}</LayoutMain>
         </LayoutRoot>
       );
