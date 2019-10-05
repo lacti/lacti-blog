@@ -13,3 +13,8 @@ declare module "*.module.css" {
   const cssModule: CSSModule;
   export = cssModule;
 }
+
+declare module "react-utterances" {
+  const ReactUtterences: React.SFC<{ repo: string; type: "pathname" | "url" }>;
+  export default ReactUtterences;
+}

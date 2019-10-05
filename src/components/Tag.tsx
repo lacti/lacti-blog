@@ -6,7 +6,7 @@ import { encodeTagForURL } from "../utils/tag";
 const StyledContainer = styled.div`
   display: inline-block;
   padding: 4px 8px;
-  margin: 0px 4px;
+  margin: 4px 4px 4px 4px;
   border-radius: 8px;
   background-color: #f1f1f1;
 `;

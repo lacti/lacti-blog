@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import ReactUtterences from "react-utterances";
 import * as React from "react";
 import { graphql } from "gatsby";
 import Page from "../components/Page";
@@ -66,6 +67,7 @@ const PageTemplate: React.SFC<PageTemplateProps> = ({
         <div dangerouslySetInnerHTML={{ __html: html }} />
       </Container>
     </Page>
+    <ReactUtterences repo="lacti/lacti.github.io" type="pathname" />
   </IndexLayout>
 );
 
