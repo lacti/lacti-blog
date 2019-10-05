@@ -28,6 +28,7 @@ interface PageTemplateProps {
       excerpt: string;
       fields: {
         date: string;
+        shortdesc: string;
       };
       frontmatter: {
         title: string;
@@ -41,12 +42,17 @@ const PageTemplate: React.SFC<PageTemplateProps> = ({
   data: {
     markdownRemark: {
       html,
-      fields: { date },
+      excerpt,
+      fields: { date, shortdesc },
       frontmatter: { title, tags }
     }
   }
 }) => (
-  <IndexLayout>
+  <IndexLayout
+    title={title}
+    description={[shortdesc, excerpt].join("\n")}
+    tags={tags}
+  >
     <Page>
       <Container>
         <h1>{title}</h1>
@@ -82,6 +88,7 @@ export const query = graphql`
       excerpt
       fields {
         date(formatString: "MMMM DD, YYYY")
+        shortdesc
       }
       frontmatter {
         title

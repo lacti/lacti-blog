@@ -15,7 +15,7 @@ const encodeTagForURL = tag => {
 exports.onCreateNode = ({ node, actions, getNode }) => {
   const { createNodeField } = actions;
   if (node.internal.type === "MarkdownRemark") {
-    const { permalink, layout } = node.frontmatter;
+    const { permalink, layout, shortdesc } = node.frontmatter;
     const { relativePath } = getNode(node.parent);
     let slug = permalink;
 
@@ -31,6 +31,7 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
 
     createNodeField({ node, name: "slug", value: slug || "" });
     createNodeField({ node, name: "layout", value: layout || "" });
+    createNodeField({ node, name: "shortdesc", value: shortdesc || "" });
   }
 };
 
