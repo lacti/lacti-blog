@@ -15,6 +15,7 @@ interface StaticQueryProps {
       title: string;
       description: string;
       keywords: string;
+      image: string;
     };
   };
 }
@@ -25,12 +26,20 @@ interface IndexProps {
   tags?: string[];
 }
 
-const IndexLayout: React.FC<IndexProps> = ({
-  title,
-  description,
-  tags,
-  children
-}) => (
+const mergeMeta = (
+  props: IndexProps,
+  meta: StaticQueryProps["site"]["siteMetadata"]
+) => ({
+  title: props.title || meta.title,
+  description: props.description || meta.description,
+  keywords:
+    !!props.tags && props.tags.length > 0
+      ? props.tags.join(", ")
+      : meta.keywords,
+  image: meta.image
+});
+
+const IndexLayout: React.FC<IndexProps> = props => (
   <StaticQuery
     query={graphql`
       query IndexLayoutQuery {
@@ -38,32 +47,35 @@ const IndexLayout: React.FC<IndexProps> = ({
           siteMetadata {
             title
             description
+            keywords
+            image
           }
         }
       }
     `}
-    render={(data: StaticQueryProps) => (
-      <LayoutRoot>
-        <Helmet
-          title={title || data.site.siteMetadata.title}
-          meta={[
-            {
-              name: "description",
-              content: description || data.site.siteMetadata.description
-            },
-            {
-              name: "keywords",
-              content:
-                !!tags && tags.length > 0
-                  ? tags.join(", ")
-                  : data.site.siteMetadata.keywords
-            }
-          ]}
-        />
-        <Header title={data.site.siteMetadata.title} />
-        <LayoutMain>{children}</LayoutMain>
-      </LayoutRoot>
-    )}
+    render={({ site: { siteMetadata } }: StaticQueryProps) => {
+      const { title, description, keywords, image } = mergeMeta(
+        props,
+        siteMetadata
+      );
+      return (
+        <LayoutRoot>
+          <Helmet
+            title={title}
+            meta={[
+              { name: "description", content: description },
+              { name: "keywords", content: keywords },
+              { name: "og:title", content: title },
+              { name: "og:type", content: "article" },
+              { name: "og:description", content: description },
+              { name: "og:image", content: image }
+            ]}
+          />
+          <Header title={title} />
+          <LayoutMain>{props.children}</LayoutMain>
+        </LayoutRoot>
+      );
+    }}
   />
 );
 

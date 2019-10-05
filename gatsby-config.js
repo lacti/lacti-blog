@@ -8,7 +8,8 @@ module.exports = {
       name: "Jaeyoung, Choi",
       url: "https://twitter.com/lacti",
       email: "lactrious@gmail.com"
-    }
+    },
+    image: "https://lacti.github.io/lacti.jpg"
   },
   plugins: [
     {
