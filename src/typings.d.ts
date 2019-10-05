@@ -15,6 +15,9 @@ declare module "*.module.css" {
 }
 
 declare module "react-utterances" {
-  const ReactUtterences: React.SFC<{ repo: string; type: "pathname" | "url" }>;
+  const ReactUtterences: React.SFC<{
+    repo: string;
+    type: "pathname" | "url" | "title";
+  }>;
   export default ReactUtterences;
 }

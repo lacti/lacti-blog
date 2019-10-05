@@ -67,7 +67,7 @@ const PageTemplate: React.SFC<PageTemplateProps> = ({
         <div dangerouslySetInnerHTML={{ __html: html }} />
       </Container>
     </Page>
-    <ReactUtterences repo="lacti/lacti.github.io" type="pathname" />
+    <ReactUtterences repo="lacti/lacti.github.io" type="title" />
   </IndexLayout>
 );
 
