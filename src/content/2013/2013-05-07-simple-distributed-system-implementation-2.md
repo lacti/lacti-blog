@@ -11,7 +11,7 @@ tags: ["distributed", "c#"]
 
 일단 구현하기에 앞서 간단히 설계도를 살펴보자.
 
-![구현 설계도](images/mdf_arch.png)
+![구현 설계도](../images/mdf_arch.png)
 
 master에는 여러 slave가 연결한다. 각 연결된 slave는 master 내에 어떤 작업을 수행하는지/했는지 info를 갖는다. master에 command가 들어오면 수행할 work를 만든다. 연결된 slave의 info를 살펴보고 적절한 slave를 선택한 후 work를 보내준다**(distribute)**. 그러면 slave는 그 작업을 처리하고 결과를 master에게 보내주던가 한다.
 

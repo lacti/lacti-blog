@@ -30,7 +30,7 @@ xml parsing 시간이 오래 걸리니 이를 해결하려면 parsing을 하지 
 
 binary로 serialize하기 위해 만든 파일의 구조를 간단히 보면 다음과 같다.
 
-![internal structure](images/binary_xml_each.png)
+![internal structure](../images/binary_xml_each.png)
 
 위 그림은 하나의 xml 파일에 해당하는 정보를 갖는다. 먼저 한 파일에 대한 `header 정보` - 파일 길이, 이름, 최종 수정 시각을 갖는다. (최종 수정 시각이 필요한 이유는 이 글 마지막 부분에 설명하겠다.) 그리고 `XmlData` 영역에 `Node`와 `Attribute`를 차례대로 기록하게 된다.
 
@@ -40,7 +40,7 @@ binary로 serialize하기 위해 만든 파일의 구조를 간단히 보면 다
 
 궁금해할 사람은 없어보이지만 string이나 list-type은 다음과 같이 serialize했다.
 
-![string, list-type](images/binary_xml_string_list_type.png)
+![string, list-type](../images/binary_xml_string_list_type.png)
 
 이렇게 Serialize한 내용을 `BinaryXml`이라고 불렀다.
 
@@ -48,7 +48,7 @@ binary로 serialize하기 위해 만든 파일의 구조를 간단히 보면 다
 
 이 문제를 해결하기 위해서 BinaryXml 앞 부분에다가 TypeDefine을 넣어주었다. TypeDefine 역시 xml으로 기록이 가능하기 때문에 BinaryXml로 변환이 가능하기 때문이다.
 
-![string, list-type](images/binary_xml_whole_file.png)
+![string, list-type](../images/binary_xml_whole_file.png)
 
 물론 TypeDefine을 BinaryXml으로 기록하기 위해서는 `TypeDefine에 대한 TypeDefine`이 필요하다. 그래야 `NodeIndex`와 `AttributeIndex`를 얻을 수 있으니까. 그 내용을 서버에서는 `DefineDefine.xml` 이라는 것으로 기술해놨는데 사실 이 부분은 그냥 코드에 박아넣어도 문제가 없었을 것이다.
 
@@ -82,7 +82,7 @@ profiling 수행 후 재미있는 결과가 나왔는데, 이는 제일 처음 �
 3. 없으면 TypeDefine에서 AttributeIndex를 찾아서 접근하고, 이 index를 잘 cache해둔다.
 4. stack 변수로 attribute 이름이 조합되어 넘어올 수 있으니 잘 integrity를 검사해준다.
 
-![attribute index cache](images/binary_xml_attribute_index_cache.png)
+![attribute index cache](../images/binary_xml_attribute_index_cache.png)
 
 BinaryXml의 각 node에 attribute 개수만큼 배열을 미리 만들어둔다. 그러면 `TypeDefine`에서 찾은 `AttributeIndex`로 바로 접근이 가능하기 때문이다. (물론 TypeDefine에서 Attribute를 찾을 때에는 string_map을 쓴다)
 

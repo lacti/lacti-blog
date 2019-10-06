@@ -27,7 +27,7 @@ tags: ["distributed", "c#"]
 
 가장 간단한 master-slave 구조를 보면 다음과 같다.
 
-![master-slave 구조](images/mdf_basic.png)
+![master-slave 구조](../images/mdf_basic.png)
 
 master는 여러 slave들을 관리하고, 실제 작업들은 slave가 처리한다고 보면 된다.
 master는 작업 요청을 받아서, **적절히 쪼개서**, **적절히 slave에게 넘겨서 처리시키고**, **결과를 적절히 받아서 합친다**
@@ -48,7 +48,7 @@ master-slave는 job/result 이외에도 주고 받아야 할 정보가 있다. �
 
 이 때 slave의 상태를 master에게 보고하기 위해 connection을 유지하거나 다시 connection을 맺는 것은 귀찮은 일이므로 다음과 같은 구조를 생각해볼 수 있다.
 
-![sync-db 구조](images/mdf_sync_db.png)
+![sync-db 구조](../images/mdf_sync_db.png)
 
 slave들은 자신의 상태를 주기적으로 state db에 기록하고, master는 state db에 기록된 정보를 참고해서 slave에게 명령을 내린다. 이 경우 master는 slave와 connection을 유지할 필요가 없게 되고 이는 master의 구현 부담을 줄일 수 있을 뿐더러 connectivity가 좋지 않은 master-slave 환경에서 보다 유연하게 동작할 수 있다.
 
@@ -56,7 +56,7 @@ slave들은 자신의 상태를 주기적으로 state db에 기록하고, master
 
 약간 다른 관점이지만 다음과 같은 모델도 생각해볼 수 있다.
 
-![stated 구조](images/mdf_stated.png)
+![stated 구조](../images/mdf_stated.png)
 
 slave 프로그램이 해야할 일은 두 가지이다. master로부터 받은 job 처리와 master에게 state를 보고하는 것. 이 둘을 나눈 구조라고 생각하면 된다.
 

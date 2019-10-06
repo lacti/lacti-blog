@@ -13,15 +13,15 @@ vs analyze 기능을 통해 확인을 해보면 가장 오래 걸리는 부분�
 
 .net `Socket`의 `BeginReceive`, `EndReceive` 함수를 사용하면 내부에서 pinvoke로 `WSARecv` 함수를 부르게 된다. `WSARecv` 함수는 `ws2_32.dll`에 정의된 함수로 얼핏보기에는 socket 확장 api가 담겨있는 `mswsock.dll`이 부를 필요가 없어 보인다. 이를 정확히 확인하기 위해 ms symbol server에서 clr 관련 symbol을 받고 다시 profiler를 돌려보았다.
 
-![functions](images/mswsock_secret_functions.png)
+![functions](../images/mswsock_secret_functions.png)
 
 진범이 나온 것 같다. `NtDeviceIoControlFile()`과 `NtRemoveIoCompletion()`이 1, 2위로 나왔다. 여기서 `NtRemoveIoCompletion()` 함수는 `GetQueuedCompletionStatus()` 때문에 불리는 것으로 추측되니 `NtDeviceIoControlFile()`의 정체만 밝히면 되겠다.
 
 간단히 calling, called를 확인해보자.
 
-![ws2_32.dll](images/mswsock_secret_ws2_32_dll.png)
+![ws2_32.dll](../images/mswsock_secret_ws2_32_dll.png)
 
-![mswsock.dll](images/mswsock_secret_mswsock_dll.png)
+![mswsock.dll](../images/mswsock_secret_mswsock_dll.png)
 
 원인이 명확해졌다.
 다량의 패킷 수신자가 `WSARecv`를 부르는 과정에서 `ws2_32.dll`의 함수가 호출된 것은 당연했다. 하지만 그 과정에서 알 수 없는 오류가 발생했고, 그 오류를 처리하기 위해 불린 `NtStatusToSocketError()` 함수가 `mswsock.dll`의 `NtDeviceIoControlFile()` 함수를 불렀던 것이다.
