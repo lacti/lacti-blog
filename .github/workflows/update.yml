@@ -4,18 +4,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Use Node.js 10.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 10.x
-    - name: Deploy using Gastby.js
-      run: |
-        npm i -g yarn
-        git config --global user.name "jaeyoung.choi"
-        git config --global user.email "lactrious@gmail.com"
-        yarn
-        yarn deploy
-      env:
-        GH_PAGES_BRANCH: master
-        GH_PAGES_REPO: ${{ secrets.GH_PAGES_REPO }}
+      - uses: actions/checkout@v1
+      - name: "Build and deploy"
+        run: |
+          docker pull lacti/blog-build-env
+          docker run \
+            -e "GH_PAGES_REPO=${GH_PAGES_REPO}" \
+            -e "GH_PAGES_BRANCH=${GH_PAGES_BRANCH}" \
+            -e "USER_EMAIL=${USER_EMAIL}" \
+            -e "USER_NAME=${USER_NAME}" \
+            -v $PWD:/blog\
+            lacti/blog-build-env
+        env:
+          GH_PAGES_BRANCH: master
+          GH_PAGES_REPO: ${{ secrets.GH_PAGES_REPO }}
+          USER_EMAIL: "lactrious@gmail.com"
+          USER_NAME: "jaeyoung.choi"
