@@ -4,10 +4,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - name: "Build and deploy"
+      - name: "Clone this repository"
+        uses: actions/checkout@v1
+      - name: "Pull a docker image"
         run: |
           docker pull lacti/blog-build-env
+      - name: "Build and deploy"
+        run: |
           docker run \
             -e "GH_PAGES_REPO=${GH_PAGES_REPO}" \
             -e "GH_PAGES_BRANCH=${GH_PAGES_BRANCH}" \
