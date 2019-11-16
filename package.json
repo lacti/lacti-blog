@@ -8,7 +8,6 @@
     "gatsby"
   ],
   "license": "MIT",
-  "main": "n/a",
   "scripts": {
     "build": "gatsby build --prefix-paths",
     "clean": "gatsby clean && rimraf public",
