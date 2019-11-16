@@ -18,11 +18,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn
+
       - name: "Build and deploy"
         run: |
           git config user.email "${USER_EMAIL}"
           git config user.name "${USER_NAME}"
-          yarn && yarn deploy
+          yarn deploy
         env:
           GH_PAGES_BRANCH: master
           GH_PAGES_REPO: ${{ secrets.GH_PAGES_REPO }}
