@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import ReactUtterences from "react-utterances";
 import * as React from "react";
-import { graphql } from "gatsby";
+import { graphql, Link } from "gatsby";
 import Page from "../components/Page";
 import Container from "../components/Container";
 import IndexLayout from "../layouts";
@@ -30,11 +30,23 @@ interface PageTemplateProps {
       fields: {
         date: string;
         shortdesc: string;
+        slug: string;
       };
       frontmatter: {
         title: string;
         tags: string[];
       };
+    };
+  };
+  pageContext: {
+    slug: string;
+    older?: {
+      title: string;
+      slug: string;
+    };
+    newer?: {
+      title: string;
+      slug: string;
     };
   };
 }
@@ -47,7 +59,8 @@ const PageTemplate: React.SFC<PageTemplateProps> = ({
       fields: { date, shortdesc },
       frontmatter: { title, tags }
     }
-  }
+  },
+  pageContext: { older, newer }
 }) => (
   <IndexLayout
     title={title}
@@ -65,6 +78,20 @@ const PageTemplate: React.SFC<PageTemplateProps> = ({
         </StyledTagsContainer>
         {/* eslint-disable-next-line react/no-danger */}
         <div dangerouslySetInnerHTML={{ __html: html }} />
+      </Container>
+      <Container>
+        {older && (
+          <Link
+            to={older.slug}
+            style={{ float: "left" }}
+          >{`< ${older.title}`}</Link>
+        )}
+        {newer && (
+          <Link
+            to={newer.slug}
+            style={{ float: "right" }}
+          >{`${newer.title} >`}</Link>
+        )}
       </Container>
     </Page>
     <ReactUtterences repo="lacti/lacti.github.io" type="title" />
@@ -91,6 +118,7 @@ export const query = graphql`
       fields {
         date(formatString: "MMMM DD, YYYY")
         shortdesc
+        slug
       }
       frontmatter {
         title

@@ -28,6 +28,7 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
         slug = `/${y}/${m}/${d}/${name}/`;
       }
     }
+    createNodeField({ node, name: `isPost`, value: match ? "yes" : "no" });
 
     createNodeField({ node, name: "slug", value: slug || "" });
     createNodeField({ node, name: "layout", value: layout || "" });
@@ -54,6 +55,24 @@ exports.createPages = async ({ graphql, actions }) => {
               tags
             }
           }
+          next {
+            fields {
+              slug
+              isPost
+            }
+            frontmatter {
+              title
+            }
+          }
+          previous {
+            fields {
+              slug
+              isPost
+            }
+            frontmatter {
+              title
+            }
+          }
         }
       }
     }
@@ -65,15 +84,38 @@ exports.createPages = async ({ graphql, actions }) => {
   }
 
   const posts = result.data.allMarkdownRemark.edges;
-  posts.forEach(({ node: { fields: { slug, layout } } }) => {
-    createPage({
-      path: slug,
-      component: path.resolve(`./src/templates/${layout || "page"}.tsx`),
-      context: {
-        slug
-      }
-    });
-  });
+  posts.forEach(
+    ({
+      node: {
+        fields: { slug, layout }
+      },
+      next,
+      previous
+    }) => {
+      const context = {
+        slug,
+        older:
+          next && next.fields.isPost === "yes"
+            ? {
+                slug: next.fields.slug,
+                title: next.frontmatter.title
+              }
+            : undefined,
+        newer:
+          previous && previous.fields.isPost === "yes"
+            ? {
+                slug: previous.fields.slug,
+                title: previous.frontmatter.title
+              }
+            : undefined
+      };
+      createPage({
+        path: slug,
+        component: path.resolve(`./src/templates/${layout || "page"}.tsx`),
+        context
+      });
+    }
+  );
 
   const allTags = Array.from(
     new Set(
