@@ -7,7 +7,7 @@ tags: ["c++", "reflection"]
 
 그리고 다 완성된 type을 register함에 있어, 따로 `register_class`, `register_field` 함수를 직접 불러서 등록을 하였는데, 이것을 [X-Macro pattern](https://en.wikipedia.org/wiki/X_Macro)을 사용하여 개선해보도록 하자.
 
-**C++ Template Metaprogramming**의 형식 삭제(type erasure) 부분을 읽다보니, 굳이 `impl_t` class를 `class_t`, `field_t` 외부로 노출할 필요가 없다는 것을 깨달았다.  
+**C++ Template Metaprogramming**의 형식 삭제(type erasure) 부분을 읽다보니, 굳이 `impl_t` class를 `class_t`, `field_t` 외부로 노출할 필요가 없다는 것을 깨달았다.
 (물론 위 책에서 언급하는 예제는 복사 및 대입 가능한 대상이기 때문에 복사/대입/소멸 등도 고려되어 있지만, 본 글에서는 단지 `impl_t`를 숨기기 위한 용도 정도로만 사용한다.)
 
 type erasure에 대한 개념을 간단히 적어보면 reflection을 만든다는 것은 결국 runtime까지 type 정보를 유지한다는 것이다. type 정보를 코드 하나하나에 다 열거하는 것은 쓸데없는 노동력을 요구하므로 적절히 template을 써서 type 정보를 capture한다.
@@ -92,7 +92,7 @@ private:
 };
 ```
 
-생성자를 template 함수로 만드는 방법은 `class_t`와 똑같은데, 아까 만든 `typeinfo`를 사용하여 type 정보를 넘기지는 않는다.  
+생성자를 template 함수로 만드는 방법은 `class_t`와 똑같은데, 아까 만든 `typeinfo`를 사용하여 type 정보를 넘기지는 않는다.
 기존의 `field_impl_t`에서 실제 field까지 template 인자로 받았던 것에 반해, 새로운 구조에서는 data member pointer를 생성 인자로 받기 때문에 `_FieldTy (_ObjTy::*Field)`이 인자를 통해서 충분한 type 유추가 가능하기 때문이다. (따라서 `impl_t`도 data member pointer를 인자로 갖도록 수정되었다.)
 
 그 이외에 `impl_t` 객체를 만들어서 `interface_t`로 지칭하는 것이나, `field_t`의 작업 함수들이 수행을 `interface_t` 객체로 위임하는 것은 위 `class_t`에서 언급했던 내용과 동일하다.
@@ -153,7 +153,7 @@ inline void reflection_register_helper_t<_ObjTy>::register_field(
     } __AUTO_NAME;
 ```
 
-(`__AUTO_NAME`은 `__COUNTER__`를 사용하여 겹치지 않는 아무 이름이나 만들어주는 매크로이다. [lambda 와 RAII #2]({% post_url 2012-05-12-lambda-and-raii-2 %}))
+(`__AUTO_NAME`은 `__COUNTER__`를 사용하여 겹치지 않는 아무 이름이나 만들어주는 매크로이다. [lambda 와 RAII #2](/2012/05/12/lambda-and-raii-2/))
 
 `REFLECTION_REGISTER_BEGIN`, `FIELD`, `END` 매크로를 사용하면 등록하고자 하는 class의 정보를 template argument로 갖는 reflection_register_helper_t에 대한 상속 class를 만든다. 그리고 생성자에서 class, field 정보를 등록하는 코드를 차례대로 만들어둔 뒤, `END` 매크로에서 이 `register_class`에 대한 변수를 하나 만들게 된다.
 

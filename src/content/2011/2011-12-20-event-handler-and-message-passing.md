@@ -6,7 +6,7 @@ tags: ["java", "message"]
 객체(object)는 상태(state)를 갖고 외부의 조작(mutator)에 의해서 변경될 수 있다.
 이러한 객체를 다루는 프로그래밍을 할 때는, 관찰자(observer)가 객체의 상태 변화(property change)를 감지하여 어떠한 동작(action)을 수행하는 경우가 많이 있다.
 
-이러한 코드를 작성할 경우, 관찰 당하는 객체(subject)와 관찰자(observer)의 관계를 어떻게 정의하냐에 따라서, 확장성, 결합성 등이 많이 달라지게 된다. 이 글에서는 간단한 EventHandler와 Message Passing에 대해서 다루어보려고 한다.  
+이러한 코드를 작성할 경우, 관찰 당하는 객체(subject)와 관찰자(observer)의 관계를 어떻게 정의하냐에 따라서, 확장성, 결합성 등이 많이 달라지게 된다. 이 글에서는 간단한 EventHandler와 Message Passing에 대해서 다루어보려고 한다.
 [https://en.wikipedia.org/wiki/Observer_pattern](https://en.wikipedia.org/wiki/Observer_pattern)
 
 ## hard binding
@@ -145,7 +145,7 @@ class List implements PropertyChangeListener {
 그리고 위 경우에도 자신이 관심있는 속성에 대해서만 `PropertyChangeEvent`를 받는 것이 아니라 모든 변경에 대해 받게 된다. 이 역시 `Person` class (사실상 Model 객체)에 `Listener`를 attach 할 때 어떤 속성에 대한 변화 통지를 받을 것인지를 따로 관리하게 하는 방법으로 해결할 수 있다.
 (하지만 더 이상의 자세한 설명은 생략한다.)
 
-또한 Reflection 등을 사용하여 각 Event type마다 다른 Handler를 호출되게 하는 방법도 있다. [간단한 Message 체계 구현]({% post_url 2011-11-27-java-message-dispatcher %})
+또한 Reflection 등을 사용하여 각 Event type마다 다른 Handler를 호출되게 하는 방법도 있다. [간단한 Message 체계 구현](/2011/11/27/java-message-dispatcher/)
 
 요약하자면 결국 송신/수신 객체간의 낮은 결합성을 고려한 상태 변화 통지의 설계가 Event Handler (Listener) 방식이라는 것이다.
 

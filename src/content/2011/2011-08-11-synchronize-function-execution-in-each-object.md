@@ -3,7 +3,7 @@ title: 객체별 함수 수행 동기화
 tags: ["concurrency", "c++", "async"]
 ---
 
-(주의, 아래 글은 Visual Studio 2010 을 쓴다는 가정하에 작성하였다. 아무튼 C++11 이 지원되어야 한다)  
+(주의, 아래 글은 Visual Studio 2010 을 쓴다는 가정하에 작성하였다. 아무튼 C++11 이 지원되어야 한다)
 여러 Thread가 동시에 접근을 수행하는 객체를 보호하기 위해서는 어떤 방법이 있을까?
 
 - lock을 건다
@@ -14,7 +14,7 @@ lock을 걸면 당연히 속도가 떨어진다. 따라서 본 글에서는 lock
 
 상황적으로 볼 때, 하나의 객체에 여러 Thread가 접근할 일은 많다. 만약 2명의 User가 Party를 맺고 사냥을 하다가, 각자 동시에 한 마리씩 몬스터를 잡았다는 message가 동시에 Server에 도착해 경험치를 각 User 객체에 넣어준다고 하자.
 
-User에는 AddExp함수를 통해 내부에 경험치를 증가시킨다. 그런데 만약 두 Thread가 경쟁적으로 AddExp를 호출할 경우, 결과 값이 제대로 들어간다는 보장이 없다. [volatile과 interlocked operation]({% post_url 2011-08-02-volatile-interlocked-operation %})
+User에는 AddExp함수를 통해 내부에 경험치를 증가시킨다. 그런데 만약 두 Thread가 경쟁적으로 AddExp를 호출할 경우, 결과 값이 제대로 들어간다는 보장이 없다. [volatile과 interlocked operation](/2011/08/02/volatile-interlocked-operation/)
 
 물론 이런 경우는 InterlockedAdd 함수를 써서 해결할 수도 있겠지만, 공유 객체에 요청되는 작업들을 Queue에 모아 동기적으로 하나의 Thread 가 처리하는 방법으로 문제를 해결해보도록 하자
 
@@ -28,7 +28,7 @@ User에는 AddExp함수를 통해 내부에 경험치를 증가시킨다. 그런
 
 공유 객체에 작업을 요청하는 Thread는 많다. 하지만 실질적으로 이 작업들을 처리하는 Thread는 단 하나다. 그렇다고 객체마다 Thread를 다 만들 수는 없다. 가장 좋은 해결책은 어떤 것일까?
 
-Lock을 생각해보자. Lock이라는 것은 여러 Thread가 접근해서 수행하는 영역의 시작과 끝에서 `Lock`, `Unlock`을 사용, 그 구간을 상호 배타적 구간(Mutual Exclusion)으로 설정하여 Thread가 동시에 접근하지 못하도록 보호하는 장치이다.  
+Lock을 생각해보자. Lock이라는 것은 여러 Thread가 접근해서 수행하는 영역의 시작과 끝에서 `Lock`, `Unlock`을 사용, 그 구간을 상호 배타적 구간(Mutual Exclusion)으로 설정하여 Thread가 동시에 접근하지 못하도록 보호하는 장치이다.
 즉, `AcquireLock` Logic은 여러 Thread가 동시에 접근하여 수행할 수 있지만, 실제로 그 routine을 벗어나 Mutex에 진입하여 코드를 실행하는 Thread는 하나로 보장이 된다. 아래의 간단한 `SpinLock` 예제를 보자 (Windows via C/C++)
 
 ```cpp
@@ -41,7 +41,7 @@ void SpinLock::Unlock(void) {
 }
 ```
 
-`InterlockedExchange`는 원자적으로 해당 변수에 값을 대입하고 그 변수의 초기값을 반환하는 연산이다. `SpinLock`은 처음에 `mLockFlag`가 0 이다. 따라서 누군가 `Lock` 함수를 요청하면 `mLockFlag`의 값을 1로 바꾸고, 0 (초기값) 을 반환한다. 따라서 바로 함수 수행이 종료된다.  
+`InterlockedExchange`는 원자적으로 해당 변수에 값을 대입하고 그 변수의 초기값을 반환하는 연산이다. `SpinLock`은 처음에 `mLockFlag`가 0 이다. 따라서 누군가 `Lock` 함수를 요청하면 `mLockFlag`의 값을 1로 바꾸고, 0 (초기값) 을 반환한다. 따라서 바로 함수 수행이 종료된다.
 하지만 다른 Thread가 동시에 `Lock`을 요청할 경우 `InterlockedExchange` 함수는 1을 반환할 것이고, 그렇다면 무한 loop 를 돌면서 `Sleep (0)`, 즉 다른 Thread에게 수행 시간을 양보한다 (물론 자신보다 우선순위가 같거나 높은 Thread들에 대해서)
 
 위 방법을 사용하여 어떠한 함수에 진입하는 Thread 의 단일성을 보장할 수 있겠다. 따라서 저 방법을 사용하여 문제를 해결해보자.
@@ -144,7 +144,7 @@ user->Request (std::bind (&User::AddExp, user, 100));
 
 User 객체에게 멤버 함수 수행 요청을 `Request` 함수를 통해 전달한다. 수행에 필요한 정보는 `std::bind`로 묶어줬다. 한 가지 아쉬운 점은 Request를 부르는 대상이 이미 user 객체로 정해졌으므로 `User::AddExp`를 수행할 대상도 Request를 요청한 user 객체인데, `std::bind`를 묶어줄 때 두 번째 인자로 이 `AddExp` 함수를 수행할 객체인 user 객체를 한 번 더 넣어줘야한다는 것이다.
 
-이 문제에 대해서는 딱히 좋은 방법이 없는 것 같다.  
+이 문제에 대해서는 딱히 좋은 방법이 없는 것 같다.
 (UserRef는 User에 대한 `shared_ptr`로 분명 `User::AddExp` 함수를 수행하기 위해서는 `User *` 를 인자로 받아야하지만 `shared_ptr`은 원본 Type 에 대한 casting operator를 overloading 했으므로 문제가 없다.)
 
 예제 코드 전문을 보자.

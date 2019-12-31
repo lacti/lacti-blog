@@ -6,7 +6,7 @@ tags: ["async", "io"]
 다중 입출력 함수는 POSIX의 select 함수를 공부하면서 가장 많이 보게 되는 함수이다. 다중 입출력 함수라는 것은 영어로 바꿔보면 multiplex io function인데 말 그대로 여러 개의 io 를 하나의 함수로 처리한다는 것이다.
 
 지난 글의 동기와 비동기에 이어서 여러 개의 io를 어떻게 처리하는 것이 효율적인지 알아보자.
-[비동기 IO 함수]({% post_url 2011-08-07-asynchronous-io %})
+[비동기 IO 함수](/2011/08/07/asynchronous-io/)
 
 지난 번에 봤던 함수들은 하나의 IO에 대해서만 사용 가능한 함수들이었다.
 대표적으로 `scanf`는 stdin(표준 입력 스트림)으로부터 값을 읽어오도록 되어있고, `ReadFile`은 열려있는 하나의 File Handle 로부터 값을 읽는다. `WSARecv` 함수는 연결되어있는 하나의 Socket으로부터 데이터를 읽는다.
@@ -35,7 +35,7 @@ for (int i = 0; i < socketCount; ++i) {
         // 데이터 처리
 ```
 
-동기적으로 처리되지만 함수 수행은 non blocking이다. 코드 작성하기는 편하겠지만 매번 데이터가 있나없나 물어보는게 꽤나 고역이 될 것 같다. 특히 채팅 서버처럼 모든 사람이 대화를 하지 않을 때 아무 일도 하지 않아도 되는 서버라면 계속 입력이 있는지 검사하는 것은 쓸데없는 작업이 될 것이다.  
+동기적으로 처리되지만 함수 수행은 non blocking이다. 코드 작성하기는 편하겠지만 매번 데이터가 있나없나 물어보는게 꽤나 고역이 될 것 같다. 특히 채팅 서버처럼 모든 사람이 대화를 하지 않을 때 아무 일도 하지 않아도 되는 서버라면 계속 입력이 있는지 검사하는 것은 쓸데없는 작업이 될 것이다.
 _(그나마 게임 서버는 남는 시간에 AI 를 돌리는 등 로직이라도 수행하는데 말이다)_
 
 ## non-blocking + asynchronous
@@ -81,7 +81,7 @@ void recv_callback (char *lpBuffer) {
 
 따라서 위의 코드를 보면 공유 자원인 `gClients`란 변수에 접근하기 위해 lock을 걸고 사용하는 것을 알 수 있다. 별로 효율상 좋아보이지 않는데 저 자료구조를 lock free하게 작성하는 것 말고는 딱히 좋은 방법도 떠오르지 않는다. (이 문제는 thread를 쓰던 non blocking io를 쓰던 모두 발생하는 문제다)
 
-아무튼 저렇게 non blocking이면서 asynchronous로 작성할 경우 모든 연결에 대해 thread를 만드는 것보다, 그리고 모든 non blocking 연결에 대해 일일히 확인하는 것보다 효율은 좋을 것이다.  
+아무튼 저렇게 non blocking이면서 asynchronous로 작성할 경우 모든 연결에 대해 thread를 만드는 것보다, 그리고 모든 non blocking 연결에 대해 일일히 확인하는 것보다 효율은 좋을 것이다.
 (당연한 이야기이지만 asynchronous 로 작성하는 경우 non blocking 일 수밖에 없다.)
 
 ## multiplexing
@@ -90,7 +90,7 @@ void recv_callback (char *lpBuffer) {
   _ [https://kldp.org/node/112275](https://kldp.org/node/112275)
   _ [https://www.joinc.co.kr/modules/moniwiki/wiki.php/Site/Network_Programing/Documents/select](https://www.joinc.co.kr/modules/moniwiki/wiki.php/Site/Network_Programing/Documents/select) \* [https://www.joinc.co.kr/modules/moniwiki/wiki.php/man/2/select](https://www.joinc.co.kr/modules/moniwiki/wiki.php/man/2/select)
 
-`select`는 이 글에서 다루기는 좀 애매하니까 넘어가자. 간략히 설명하면 여러 IO를 동시에 감시하고 그에 대해 통보 받을 수 있다는 것이다. 이는 asynchronous IO 함수를 쓰지 않고, non blocking IO들을 무의미하게 loop 돌면서 검사하지 않아도 어느정도 효율적으로 IO를 관리할 수 있고, 게다가 동기적으로(하나의 scope 내에서) 로직을 작성할 수 있으므로 코드를 작성하기도 편하다.  
+`select`는 이 글에서 다루기는 좀 애매하니까 넘어가자. 간략히 설명하면 여러 IO를 동시에 감시하고 그에 대해 통보 받을 수 있다는 것이다. 이는 asynchronous IO 함수를 쓰지 않고, non blocking IO들을 무의미하게 loop 돌면서 검사하지 않아도 어느정도 효율적으로 IO를 관리할 수 있고, 게다가 동기적으로(하나의 scope 내에서) 로직을 작성할 수 있으므로 코드를 작성하기도 편하다.
 동기적으로 작성되면 scope에 의해 context(변수 등)가 공유되고 실행 흐름을 파악하기 쉽기 때문에 문제가 발생할 확률이 적기 때문이다. 예를 들어 다음의 코드를 보자.
 
 ```cpp
@@ -131,13 +131,13 @@ multi thread 를 생각해보자.
 
 _apache 웹 서버는 내부에서 select로 처리를 하다가 처리량이 많아지면 fork를 수행한다. 리눅스의 fork 자체는 그리 비싼 비용이 아니지만 어쨌든 부담이 있다. 물론 fork해서 process가 많아지기 때문에 전체적으로 apache군이 cpu scheduling 을 받을 확률은 증가하지만, 이 글에서 이야기할 건 아닌 것 같다._
 
-발상을 약간 전환해보자.  
+발상을 약간 전환해보자.
 multi core가 있는 환경에서 어떤 프로그램이 가장 빠르게 수행하기 위한 thread의 개수는 몇 개일까?
 물론 반드시 한 프로그램만 수행된다는 보장이 없으므로 단언할 수 없고 수행 결과를 통해 tuning해봐야겠지만, 이상적으로 논한다면 core의 개수 만큼 thread를 갖으면 각 core마다 thread 1개씩 맡아서 수행해주니까 가장 빠를 것이다.
 
 바꿔말하면, 다중 입출력을 수행하기 위해 thread를 여러 개 사용한다고 했을 때 입력 요청이 빈번하든 그렇지 않든 어차피 동시에 처리할 수 있는 thread의 개수는 core(processor)의 개수만큼이라는 것이다.
 
-또한 위의 상황들을 비교해볼 때, 뭔가 IO 요청은 non blocking으로 요청하지만 완료 통지(completion notification)는 동기적(synchronous)으로 받아보고 싶다는 생각을 할 수 있다. 어찌보면 장점만 모으는 것인데, IO 함수가 다른 실행 흐름을 방해하지도 않으면서, 그 결과는 내가 직접 물어보고 처리하니까 처리 문맥도 보존이 되니 코딩하기도 편하다.  
+또한 위의 상황들을 비교해볼 때, 뭔가 IO 요청은 non blocking으로 요청하지만 완료 통지(completion notification)는 동기적(synchronous)으로 받아보고 싶다는 생각을 할 수 있다. 어찌보면 장점만 모으는 것인데, IO 함수가 다른 실행 흐름을 방해하지도 않으면서, 그 결과는 내가 직접 물어보고 처리하니까 처리 문맥도 보존이 되니 코딩하기도 편하다.
 그리고 이것들을 처리하는 thread 까지 core 개수에 맞춘다면? 그렇다면 그걸 효율적인 처리라고 할 수 있지 않을까.
 
 그래서 나온게 IOCP(Input Output Completion Port)이다. 사실 얘가 하는 일은 크게 없는데,
@@ -145,7 +145,7 @@ multi core가 있는 환경에서 어떤 프로그램이 가장 빠르게 수행
 - 운영체제 내부에 IO 요청을 쌓는 Queue를 만든다.
 - 운영체제 내부에 IO 완료를 쌓는 Queue를 만든다.
 
-정도로 이해하면 편하다.  
+정도로 이해하면 편하다.
 _(Windows Internals 나 Windows via C/C++ 을 보면 더 자세히 설명이 나오지만 이 글에서는 저정도로만 설명해보자. 어차피 IOCP 설명하는 글은 아니다.)_
 
 - thread를 core개수만큼 만들었다. 그럼 이제 각 thread 는 IO 요청을 하고, 또한 각 요청이 완료되면 그 결과를 처리해야한다. 그리고 그것들은 **순서가 보장되어야 한다**.
@@ -154,10 +154,10 @@ _(Windows Internals 나 Windows via C/C++ 을 보면 더 자세히 설명이 나
 
 - kernel에서 그 요청이 완료되면, 완료되었다고 그것을 완료 queue에 넣는다. 그러면 각 thread는 `GetQueuedCompletionStatus`라는 함수를 통해 하나씩 꺼내서 확인한다. 그리고 IO 작업 완료를 **직접 확인했으니까** 그에 대한 처리를 진행한다. 이는 asynchronous IO 모델이 callback 함수를 언제 부를지 모르는 것에 비해, 직접 완료된 IO 가 있는지 확인하는 것이기 때문에 synchronous IO 모델이라고 할 수 있는 것이다.
 
-즉, IO 의 요청은 모두 non blocking으로 진행되고, 각 요청이 완료되었는지를 직접 확인하여 처리하는 thread가 core의 개수만큼 있으므로 효율적으로 IO 를 처리할 수 있다는 것이다.  
+즉, IO 의 요청은 모두 non blocking으로 진행되고, 각 요청이 완료되었는지를 직접 확인하여 처리하는 thread가 core의 개수만큼 있으므로 효율적으로 IO 를 처리할 수 있다는 것이다.
 _(물론 언어 자체에서 thread를 효율적으로 관리해주고 하면 완전 asynchronous하게 동작하는 서버가 더 효율적일 수 있을 것 같다.)_
 
-IO 프로그래밍을 할 때 요청과 완료 통지를 별개로 생각해보면 효율적 향상점을 찾을 수 있다. 물론 non blocking에 asynchronous한 모델이 더 생각하기도 어렵고 문제없이 작성하기도 어렵다.  
+IO 프로그래밍을 할 때 요청과 완료 통지를 별개로 생각해보면 효율적 향상점을 찾을 수 있다. 물론 non blocking에 asynchronous한 모델이 더 생각하기도 어렵고 문제없이 작성하기도 어렵다.
 예를 들면, 상대와 메세지를 주거니 받거니 해야하는 경우 blocking이라면 주거니 받거니 하는 코드를 한 scope 내에서 작성하면 절차적으로 쓰고, 읽고, 쓰고, ... 순으로 수행이 되겠지만 non blocking이라면 그 요청이 끝날 때까지 기다려야하니 복잡해진다. 그래서 내부적으로 어디까지 받았는지 state로 관리해주던가 하는 부가적인 일을 더 해야하는 것이다.
 
 ## 마무리

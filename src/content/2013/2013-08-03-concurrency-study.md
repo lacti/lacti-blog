@@ -7,12 +7,12 @@ tags: ["concurrency", "study"]
 
 - [Wiki: ABA problem](https://en.wikipedia.org/wiki/ABA_problem)
 - [Simple, Fast, and Practical Non-Blocking and Blocking Concurrent Queue Algorithms](https://www.cs.rochester.edu/u/scott/papers/1996_PODC_queues.pdf)
-- [context switching과 simultaneously 실행]({% post_url 2011-08-02-context-switching-and-simultaneously %})
-- [환형큐의 thread unsafety 문제]({% post_url 2012-02-23-thread-unsafety-problem-in-circular-queue %})
+- [context switching과 simultaneously 실행](/2011/08/02/context-switching-and-simultaneously/)
+- [환형큐의 thread unsafety 문제](/2012/02/23/thread-unsafety-problem-in-circular-queue/)
 
 ## volatile/interlocked operation/memory barrier
 
-- [volatile 과 interlocked operation]({% post_url 2011-08-02-volatile-interlocked-operation %})
+- [volatile 과 interlocked operation](/2011/08/02/volatile-interlocked-operation/)
 - [summerlight: volatile과 메모리 배리어](https://summerlight-textcube.blogspot.kr/2009/11/volatile%EA%B3%BC-%EB%A9%94%EB%AA%A8%EB%A6%AC-%EB%B0%B0%EB%A6%AC%EC%96%B4.html)
 
 ## intrusive/non-intrusive
@@ -23,14 +23,14 @@ tags: ["concurrency", "study"]
 
 ## InterlockedSList
 
-- [Interlocked Singly Linked Lists]({% post_url 2011-08-03-interlocked-singly-linked-lists %})
+- [Interlocked Singly Linked Lists](/2011/08/03/interlocked-singly-linked-lists/)
 
 ## Actor model
 
 각 actor 객체에 접근하는 thread는 반드시 하나임을 보장함. context switching 비용을 줄이기 위해 thread 개수를 제한하지만 많은 actor를 다루기 위해 객체별 수행 동기화 기법을 사용한다.
 
 - [Wiki: Actor model](https://en.wikipedia.org/wiki/Actor_model)
-- [객체별 함수 수행 동기화]({% post_url 2011-08-11-synchronize-function-execution-in-each-object %})
+- [객체별 함수 수행 동기화](/2011/08/11/synchronize-function-execution-in-each-object/)
 
 ## out of order execution
 
@@ -62,7 +62,7 @@ c++11에 memory order로 추가됨.
 
 아무튼 async가 흐름 따라가기가 어렵다.
 
-- [asynchronous programming 과 async, await]({% post_url 2012-03-18-asynchronous-programming-and-async-await %})
+- [asynchronous programming 과 async, await](/2012/03/18/asynchronous-programming-and-async-await/)
 
 ## c++11의 lambda
 

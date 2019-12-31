@@ -67,7 +67,7 @@ async void ProcessSocket(Socket clientSocket) {
 
 > allow multiple entry points for suspending and resuming execution at certain locations
 
-정의 자체가 위와 같기 때문에 가장 낮은 수준에서 생각해보면 cpu context를 마음대로 치환할 수 있으면 coroutine을 쉽게 만들 수 있겠다! (user mode context switching)  
+정의 자체가 위와 같기 때문에 가장 낮은 수준에서 생각해보면 cpu context를 마음대로 치환할 수 있으면 coroutine을 쉽게 만들 수 있겠다! (user mode context switching)
 boost는 boost context를 먼저 만들어서 cpu context를 capture할 수 있게 한 다음 그것을 사용해서 boost coroutine을 만들었다.
 
 그런데 그런 구현 방법 뿐만 아니라 generator를 이용해서 대충 coroutine처럼 사용할 수 있도록 할 수도 있다. c#의 yield return이 그런 형태인데, 이건 그냥 compiler가 해당 코드를 state machine으로 만들어서 다시 부르면 다음 코드부터 이어서 실행될 수 있도록 만들어 주는 것.
@@ -113,8 +113,8 @@ struct MyGeneratorStateMachine {
 
 약간 거리가 있지만
 
-- [비동기 IO 함수]({% post_url 2011-08-07-asynchronous-io %})
-- [IO와 메모리 복사]({% post_url 2011-08-14-io-and-memory-copy %})
+- [비동기 IO 함수](/2011/08/07/asynchronous-io/)
+- [IO와 메모리 복사](/2011/08/14/io-and-memory-copy/)
 
 어쨌든 io는 request 과정과 completion을 처리하는 과정 두 개로 나누어 생각해볼 수 있다. 하나의 io 함수가 두 개를 모두 처리한다면 (보통은) blocking function이 될 것이고, 이 둘을 나누어서 처리한다면 non-blocing function이 될 것이다.
 
@@ -208,7 +208,7 @@ iocp를 만들고 열심히 profiling을 해보니 3가지 문제가 있댄다.
 2. `GetQueuedCompletionStatus()` 함수 등의 api를 부를 때 kernel mode switching 비용
 3. request/completion 마다 device handle에 mapping된 completion port handle을 찾는 비용(handle table lookup)
 
-1번의 경우는 zero-byte receive 기법으로 대충 우회가 된다. locked page가 뭔 소리인지는 대충 다음 링크에서 보자. [IO와 메모리 복사]({% post_url 2011-08-14-io-and-memory-copy %})
+1번의 경우는 zero-byte receive 기법으로 대충 우회가 된다. locked page가 뭔 소리인지는 대충 다음 링크에서 보자. [IO와 메모리 복사](/2011/08/14/io-and-memory-copy/)
 
 rio는 각 문제를 다음과 같이 해결했다.
 

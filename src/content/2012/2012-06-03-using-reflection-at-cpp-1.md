@@ -7,7 +7,7 @@ mmo-server에서 attribute를 json serialize하기 위해 attribute가 가지고
 
 그렇게 고민하다가 예전에 쓴 글을 발견했다.
 
-- [c++에서 구조체 RTTI 정보 남기기]({% post_url 2011-09-30-using-rtti-at-cpp %})
+- [c++에서 구조체 RTTI 정보 남기기](/2011/09/30/using-rtti-at-cpp/)
 
 기본 아이디어는 다음과 같다. 각 class마다 자신의 field에 대한 정보를 갖는다. 이름과 멤버 변수 포인터 쌍을 가진다고 보면 된다. 여기서 골치가 아픈건 저 field에 대한 정보를 어떻게 표기하냐인데, 멤버 변수 포인터라는 type을 좀 generic하게 관리해줄 방법이 필요하다. 제대로 하려면 코드가 복잡해질테니 대충 다음과 같이 틀만 잡았다.
 
@@ -56,7 +56,7 @@ protected:
 
 실제 `ptr()` 함수 구현체는 그냥 object를 `field_impl_t` class가 아는 object type으로 강제 casting한 후, 거기서 찾고자 하는 멤버 field의 위치 주소를 찾아서 반환해주는 것이다.
 
-`field_t`와 `field_impl_t`의 관계에서 볼 수 있듯이 둘은 object의 type으로는 엮여있지 않고, 덕분에 `reinterpret_cast`를 쓴다. 이 때문에 잘못된 object가 들어가면 굉장한 광경을 볼 수 있다! (게다가 실행해보기 전까지는 모른다는게 함정!)  
+`field_t`와 `field_impl_t`의 관계에서 볼 수 있듯이 둘은 object의 type으로는 엮여있지 않고, 덕분에 `reinterpret_cast`를 쓴다. 이 때문에 잘못된 object가 들어가면 굉장한 광경을 볼 수 있다! (게다가 실행해보기 전까지는 모른다는게 함정!)
 ... 물론 `ref()` 함수의 반환 타입만 잘못 지정해도 무시무시한 일이 벌어진다.
 
 이제 저 `field_t`를 관리하는 관리 class를 만들어보자. 귀찮으니까 코드를 먼저 보자.

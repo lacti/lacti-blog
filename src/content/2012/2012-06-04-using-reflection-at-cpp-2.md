@@ -15,7 +15,7 @@ tags: ["c++", "reflection"]
 - class 정보는 field 정보를 이름(문자열)로 찾을 수 있어야 함
 - field 정보는 객체의 주소로부터 field 값을 가져오거나 설정할 수 있어야 함
 
-마지막 항목은 지난 글에서 구현했던 내용이니, 앞의 세 항목을 어떻게 구현했는지 보도록 하자.  
+마지막 항목은 지난 글에서 구현했던 내용이니, 앞의 세 항목을 어떻게 구현했는지 보도록 하자.
 (본 글에서는 글 읽는 흐름과 상관없는 별로 안 중요한 코드는 생략한다.)
 
 먼저 class 정보에 대응되는 class를 만들어보자. 요구사항에서 언급했듯이, 얘는 자신의 type정보로 객체를 생성 가능해야하며, 이름으로 특정 field를 찾을 수 있어야 한다.
@@ -62,7 +62,7 @@ private:
 
 구체 class는 어차피 자기가 어떤 class에 대한 것인지 type 정보를 template으로 받고 있으므로 그에 대해 new 해서 돌려주면 그만이다. 물론 기본 생성자가 없다면 컴파일 에러가 난다.
 
-이는 [java annotation과 reflection을 사용한 xml mapping]({% post_url 2012-05-31-xml-mapping-using-java-annotation-and-reflection %})에서 `Class#newInstance()`와 기본생성자에 관해 이야기했던 것과 동일한 이유라고 보면 된다.  
+이는 [java annotation과 reflection을 사용한 xml mapping](/2012/05/31/xml-mapping-using-java-annotation-and-reflection/)에서 `Class#newInstance()`와 기본생성자에 관해 이야기했던 것과 동일한 이유라고 보면 된다.
 기본 생성자가 아닌 생성자에 대해서도 고려해주려면 method에 대한 reflection도 만들어주어야 하는데 variadic template을 지원하지 않는 MSVC10에서는 별로 구현하고 싶지 않다(...)
 
 이제 class의 이름과 `class_t`를 관리해줄 관리자 class를 만들어야 한다. class의 이름은 `std::type_info.name()`을 쓰면 좋겠지만 이 이름이 그닥 적절하지 못하다.
@@ -183,7 +183,7 @@ int _tmain(int argc, _TCHAR* argv[])
 }
 ```
 
-`user_t`에 대해 reflection을 등록한다.  
+`user_t`에 대해 reflection을 등록한다.
 (이 부분은 딱히 답이 없는데, 편하게 하려면 code generator를 사용한다던가 하는 수 밖에 없어보인다.
 아니면 [if1live]님이 했던 것처럼 매크로로 구조체를 만들도록 하든가.)
 

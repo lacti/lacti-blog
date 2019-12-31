@@ -35,7 +35,7 @@ int _tmain(int argc, _TCHAR* argv[])
 }
 ```
 
-c++ code 한 줄이 원자적(atomic)으로 실행된다는 보장은 없다. assembly의 한 줄도 원자적으로 실행된다는 보장은 없다(smp, micro-operation)  
+c++ code 한 줄이 원자적(atomic)으로 실행된다는 보장은 없다. assembly의 한 줄도 원자적으로 실행된다는 보장은 없다(smp, micro-operation)
 위 코드를 release로 빌드해보면 `++counter` 부분에 대한 코드가 assembly로 한 줄이 나오는데, 어쨌든 expect와 actual 값이 다르게 나온다는 것은 해당 연산이 원자적으로 수행되지 않는다는 것이다.
 
 재밌는 것은 volatile keyword를 제거한 후 release로 build하면 제법 문제없는 결과가 나오는 것처럼 보인다는 것이다. 그 이유를 생성된 assembly code를 통해 확인하면 알 수 있는데, `for (loop_counter) ++counter` 부분이 `counter += loop_counter` 코드로 최적화되어 버리기 때문이다. `counter += loop_counter` 명령은 원자적이지 않지만, 다음 thread가 생성되어 간섭하기 전에 완료될 수 있을만큼 명령이 단순하므로 thread간 간섭이 없어 문제가 발생하지 않는 것처럼 보이는 것이다. (직접 위 코드를 release로 빌드하여 assembly를 확인해보면 더욱 명확하다)
@@ -63,7 +63,7 @@ void add_entry()
 
 ## atomic_int
 
-두 번째 해결책은 `atomic_int`를 사용하는 것이다. [volatile과 interlocked operation]({% post_url 2011-08-02-volatile-interlocked-operation %})
+두 번째 해결책은 `atomic_int`를 사용하는 것이다. [volatile과 interlocked operation](/2011/08/02/volatile-interlocked-operation/)
 
 ```cpp
 std::atomic_int counter;

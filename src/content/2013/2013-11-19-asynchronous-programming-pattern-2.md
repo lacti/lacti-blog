@@ -3,7 +3,7 @@ title: 비동기 프로그래밍 패턴 2
 tags: ["async", "design"]
 ---
 
-위 이야기에 이어, async 작업과 then 작업 간의 상태 공유에 대해서 알아보자.  
+위 이야기에 이어, async 작업과 then 작업 간의 상태 공유에 대해서 알아보자.
 async에서 then으로 상태를 전달하는 가장 기본적인 방법은 반환값을 사용하는 방법이다. 다른 방법으로는 lambda function에 의한 variable capture가 있겠다.
 
 ```cpp
@@ -47,9 +47,9 @@ async_worker 개념은 단순하고 직관적이다. 마치 functor를 만들기
 
 - async는 그 자체가 오래 걸리는 작업인 경우가 많은데,
 - async_worker의 `work()` 함수들은 다른 비동기 작업의 완료(completion)에 의해 callback으로 불리는 경우도 있고,
-- 각기 다른 [객체의 수행 흐름]({% post_url 2011-08-11-synchronize-function-execution-in-each-object %})에서 불리는 경우도 있다.
+- 각기 다른 [객체의 수행 흐름](/2011/08/11/synchronize-function-execution-in-each-object/)에서 불리는 경우도 있다.
 
-async_worker 패턴은 stackless coroutine 구현으로도 사용될 수 있다. stackless coroutine은 stack을 갖지 않는 coroutine으로 c#의 async/await을 생각하면 된다. 즉 instruction pointer와 stack pointer를 치환하는 방식의 coroutine이 아닌 compiler의 code generation을 통해 multiple entry/return을 구현하는 방식이라고 생각하면 되겠다.  
+async_worker 패턴은 stackless coroutine 구현으로도 사용될 수 있다. stackless coroutine은 stack을 갖지 않는 coroutine으로 c#의 async/await을 생각하면 된다. 즉 instruction pointer와 stack pointer를 치환하는 방식의 coroutine이 아닌 compiler의 code generation을 통해 multiple entry/return을 구현하는 방식이라고 생각하면 되겠다.
 (자세한 이야기는 coroutine 이야기에서 다루도록 하겠다)
 
 쉬운 접근을 위해 `my_async_worker` 코드를 다음과 같이 고쳐보도록 하겠다.

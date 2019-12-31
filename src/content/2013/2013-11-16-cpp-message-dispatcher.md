@@ -253,5 +253,5 @@ void main() {
 
 추가 과제였던 reflection 과제에 대한 풀이는 예전에 작성한 글에 대한 링크로 대신하겠다.
 
-- [c++에서 reflection 사용하기 2]({% post_url 2012-06-04-using-reflection-at-cpp-2 %})
-- [c++에서 reflection 사용하기 3]({% post_url 2012-06-09-using-reflection-at-cpp-3 %})
+- [c++에서 reflection 사용하기 2](/2012/06/04/using-reflection-at-cpp-2/)
+- [c++에서 reflection 사용하기 3](/2012/06/09/using-reflection-at-cpp-3/)

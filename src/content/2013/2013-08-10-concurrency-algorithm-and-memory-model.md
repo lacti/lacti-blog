@@ -63,7 +63,7 @@ P1: turn = 0;
 - [Boost: Thread coordination using Boost.Atomic](https://www.boost.org/doc/libs/release/doc/html/atomic/thread_coordination.html)
 - [Cppref: std::memory_order](https://en.cppreference.com/w/cpp/atomic/memory_order)
 
-메모리 가시성 개념도 포함되어 있음. fence를 경계로 비순차 수행 가능 범위의 경계가 생김.  
+메모리 가시성 개념도 포함되어 있음. fence를 경계로 비순차 수행 가능 범위의 경계가 생김.
 인텔 x86-64 core를 쓰면 알아서 해주기 때문에 프로그래머가 신경 쓸 필요가 없다.
 
 표준에서 설명하는 `memory_order_consume`, `memory_order_acquire`의 차이를 잘 모르겠음.
@@ -78,12 +78,12 @@ P1: turn = 0;
 - lock free algorithm과 aba problem: [Non_Blocking_Algorithm.pdf](https://sites.google.com/site/doc4code/Non-Blocking%20Algorithm.pdf)
 - obstruction-free, lock-free, wait-free 개념 구분
 - CAS, CAS2(CASW), DCAS, TSX, RTM 대충
-- aba problem이 잘 설명되어 있다. CAS를 node pointer로만 하기 때문에 그 주소값만 같으면 해당 주소가 가리키는 객체의 상태가 어떻게 변했어도 작업이 진행될 수 있는 것이 문제.  
+- aba problem이 잘 설명되어 있다. CAS를 node pointer로만 하기 때문에 그 주소값만 같으면 해당 주소가 가리키는 객체의 상태가 어떻게 변했어도 작업이 진행될 수 있는 것이 문제.
    (즉 stack/queue를 나갔다가 다시 들어왔을 때, 해제되었다가 다시 할당되었는데 그 주소가 같을 때)
   w
   즉, 객체의 pointer 비교만으로는 객체의 상태 비교가 안되므로 count를 넣어서 객체의 버전관리(?)를 한다. CAS할 때마다 count를 증가시켜 이전과는 다른 객체라고 기록해주는 것. 여기서 CAS2가 쓰인다.
 
-근데 InterlockedSList는 가난한 시절이라 CAS2 못 쓰고 memory alignment해서 남는 하위 4bit를 count로 쓴 것으로 알고 있다.  
+근데 InterlockedSList는 가난한 시절이라 CAS2 못 쓰고 memory alignment해서 남는 하위 4bit를 count로 쓴 것으로 알고 있다.
 (어설픈 기억으로는 MPMC concurrency queue를 lock free algorithm으로 만들 때 CAS 뭔가 잘못써서 aba problem 발생하면 해당 node가 다른 queue로 들어간 시점에도 뭔가 오동작하여 해당 queue까지 파괴했던 시나리오가 있었는데(...) 자세히 기억이 안 난다.)
 
 ## [hazard pointer](https://www.drdobbs.com/lock-free-data-structures-with-hazard-po/184401890)
@@ -94,9 +94,9 @@ P1: turn = 0;
 
 ## 환형큐의 concurrency 문제
 
-- [환형큐의 thread unsafety 문제]({% post_url 2012-02-23-thread-unsafety-problem-in-circular-queue %})
+- [환형큐의 thread unsafety 문제](/2012/02/23/thread-unsafety-problem-in-circular-queue/)
 
-## [객체별 수행 동기화]({% post_url 2011-08-11-synchronize-function-execution-in-each-object %}) 글 코드의 문제
+## [객체별 수행 동기화](/2011/08/11/synchronize-function-execution-in-each-object/) 글 코드의 문제
 
 [angdev]님의 문제 해결법
 
