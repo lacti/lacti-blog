@@ -63,12 +63,12 @@ int main (int argc, char *argv[]) {
 ```cpp
 odarray oa1(10);
 oa1[4] = 10;
-std::cout << oa1 << std::endl;[/code]
+std::cout << oa1 << std::endl;
 ```
 
 `oa1[4] = 10;` 구문에서는 값의 변경이 필요하기 때문에 당연히 int&를 반환하는 non-constness 함수를 호출할 것이다.
 
-하지만 `std::cout << oa1 << std::endl;` 구문에서는 `oa1`을 `ostream`으로 출력하는 함수의 원형을 봐야한다. `std::ostream& operator << (std::ostream& out, const odarray& array)`  
+하지만 `std::cout << oa1 << std::endl;` 구문에서는 `oa1`을 `ostream`으로 출력하는 함수의 원형을 봐야한다. `std::ostream& operator << (std::ostream& out, const odarray& array)`
 즉 이 함수는 인자로 `const odarray`를 받기 때문에 `odarray` 객체의 const를 보장하기 위해서 이 함수 내에서 호출되는 `odarray`의 멤버 함수는 모두 const 함수가 되는 것이다. 따라서 위 구문에서는 int를 반환하는 const 함수가 호출된다.
 
 ## 결론
