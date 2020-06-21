@@ -39,6 +39,13 @@ module.exports = {
               quality: 90,
               linkImagesToOriginal: false
             }
+          },
+          {
+            resolve: "gatsby-remark-embedder",
+            options: {
+              // eslint-disable-next-line global-require
+              customTransformers: [require("gatsby-embedder-excalidraw")]
+            }
           }
         ]
       }
