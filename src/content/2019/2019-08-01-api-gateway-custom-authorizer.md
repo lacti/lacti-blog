@@ -1,5 +1,5 @@
 ---
-title: API Gateway의 인증을 위한 Custom Authroizer 사용하기
+title: API Gateway의 인증을 위한 Custom Authorizer 사용하기
 tags: ["aws", "serverless", "auth"]
 ---
 
@@ -93,10 +93,10 @@ const decodeBase64 = (input: string) =>
 const jwtSecret = "verySecret";
 const admin = {
   id: "test",
-  password: "1234"
+  password: "1234",
 };
 
-export const login: APIGatewayProxyHandler = async event => {
+export const login: APIGatewayProxyHandler = async (event) => {
   const [type, data] = splitByDelimiter(event.headers["Authorization"], " ");
   const [id, pw] = splitByDelimiter(decodeBase64(data), ":");
 
@@ -104,13 +104,13 @@ export const login: APIGatewayProxyHandler = async event => {
   if (!accepted) {
     return {
       statusCode: 401,
-      body: "Unauthorized"
+      body: "Unauthorized",
     };
   }
   const token = jwt.sign({ id }, jwtSecret, { expiresIn: "30m" });
   return {
     statusCode: 200,
-    body: JSON.stringify({ token })
+    body: JSON.stringify({ token }),
   };
 };
 ```
@@ -122,7 +122,7 @@ export const login: APIGatewayProxyHandler = async event => {
 이제 이후에는 생성된 JWT로만 요청을 하게 될 것이므로 이 토큰의 유효성을 검증하는 `auth function`은 간단하게 작성할 수 있다. 이 token은 [Bearer Authorization](https://tools.ietf.org/html/rfc6750)으로 전달되므로 그 값을 받아 [라이브러리](https://github.com/auth0/node-jsonwebtoken)로 유효성을 검사한다.
 
 ```typescript
-export const auth: CustomAuthorizerHandler = async event => {
+export const auth: CustomAuthorizerHandler = async (event) => {
   const [type, token] = splitByDelimiter(event.authorizationToken, " ");
   const allow = type === "Bearer" && !!jwt.verify(token, jwtSecret);
   return {
@@ -133,10 +133,10 @@ export const auth: CustomAuthorizerHandler = async event => {
         {
           Action: "execute-api:Invoke",
           Effect: allow ? "Allow" : "Deny",
-          Resource: event.methodArn
-        }
-      ]
-    }
+          Resource: event.methodArn,
+        },
+      ],
+    },
   };
 };
 ```
@@ -176,10 +176,10 @@ authorizer:
 이제 테스트를 위해 사용할 간단한 GET API를 만들어둔다. 이 함수는 `auth function`이 `allow policy`를 반환할 경우 불리게 된다.
 
 ```typescript
-export const hello: APIGatewayProxyHandler = async event => {
+export const hello: APIGatewayProxyHandler = async (event) => {
   return {
     statusCode: 200,
-    body: JSON.stringify(event)
+    body: JSON.stringify(event),
   };
 };
 ```
